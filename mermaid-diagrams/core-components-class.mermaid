@@ -1,0 +1,52 @@
+classDiagram
+    class VideoPlayer {
+        -videoRef: HTMLVideoElement
+        -currentVideo: VideoResource
+        -playbackState: PlaybackState
+        +play()
+        +pause()
+        +seek(time: number)
+        +setQuality(level: string)
+    }
+    
+    class PlaybackManager {
+        -loadQueue: VideoResource[]
+        -preloadedVideos: Map
+        +preloadVideo(url: string)
+        +getNextVideo()
+        -cleanupOldPreloads()
+        -handleLoadError(error: Error)
+    }
+    
+    class SwipeController {
+        -threshold: number
+        -velocity: number
+        -direction: string
+        +handleSwipeStart(x: number, y: number)
+        +handleSwipeMove(x: number, y: number)
+        +handleSwipeEnd()
+        -calculateSwipeResult()
+    }
+    
+    class CollectionManager {
+        -collections: Collection[]
+        -userId: string
+        +createCollection(name: string)
+        +addToCollection(videoId: string, collectionId: string)
+        +removeFromCollection(videoId: string, collectionId: string)
+        -syncWithFirestore()
+    }
+    
+    class StateManager {
+        -state: ApplicationState
+        -subscribers: Set<Function>
+        +dispatch(action: Action)
+        +subscribe(listener: Function)
+        -notifySubscribers()
+        -persistState()
+    }
+    
+    VideoPlayer ..> PlaybackManager
+    SwipeController ..> VideoPlayer
+    CollectionManager ..> StateManager
+    PlaybackManager ..> StateManager

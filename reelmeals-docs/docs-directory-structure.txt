@@ -1,0 +1,23 @@
+docs/
+├── architecture/
+│   ├── system-overview.md         # High-level system architecture
+│   ├── data-flow.md              # How data moves through the system
+│   ├── state-management.md       # How we handle application state
+│   └── performance.md            # Performance considerations and strategies
+├── features/
+│   ├── video-player.md           # Video playback implementation
+│   ├── swipe-mechanics.md        # Swipe interaction details
+│   ├── collections.md            # Recipe collection management
+│   └── offline-support.md        # PWA offline functionality
+├── data/
+│   ├── schema.md                 # Database schema documentation
+│   ├── migrations.md             # Data migration plans
+│   └── relationships.md          # Data relationships and constraints
+├── setup/
+│   ├── development.md            # Development environment setup
+│   ├── firebase.md              # Firebase configuration guide
+│   └── deployment.md            # Deployment procedures
+└── testing/
+    ├── strategy.md              # Overall testing approach
+    ├── performance.md           # Performance testing guidelines
+    └── accessibility.md         # Accessibility testing requirements

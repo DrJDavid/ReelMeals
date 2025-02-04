@@ -1,0 +1,241 @@
+# ReelMeals: Swipeable Cooking Video Platform
+
+## Product Requirements Document (PRD) v3.0 - Week 1 MVP
+
+## 1. Product Vision
+
+ReelMeals reimagines recipe discovery through an intuitive, swipe-based interface that helps home cooks find and save cooking videos they love. By combining the engaging mechanics of Tinder with the educational value of cooking content, we create an immersive learning experience that makes recipe discovery feel like a personal journey of culinary exploration.
+
+## 2. User Experience Flow
+
+When users open ReelMeals, they enter a focused, distraction-free environment where they can discover cooking videos one at a time. Each video plays automatically while displaying essential information like cooking time and cuisine type. Users make simple, binary decisions: swipe right to save recipes they want to try, or left to move to the next video. This creates a natural, engaging rhythm of discovery that feels both efficient and enjoyable.
+
+## 3. Core Features - Week 1 MVP
+
+### 3.1 Swipeable Video Interface
+
+**User Story**: "As a home cook, I want to watch cooking videos one at a time and easily save the ones I like with a simple swipe gesture."
+
+Technical Implementation:
+
+```typescript
+interface VideoCard {
+  id: string;
+  videoUrl: string;
+  title: string;
+  cuisine: string;
+  cookingTime: number;
+  difficulty: 'Easy' | 'Intermediate' | 'Advanced';
+  ingredients: string[];
+}
+
+// Core video player with swipe mechanics
+function VideoSwiper() {
+  const [currentVideo, setCurrentVideo] = useState<VideoCard | null>(null);
+  
+  // Preload next video while current one plays
+  useEffect(() => {
+    if (currentVideo) {
+      preloadNextVideo();
+    }
+  }, [currentVideo]);
+
+  return (
+    <SwipeableView
+      onSwipeLeft={() => handleSkip()}
+      onSwipeRight={() => handleSave()}
+    >
+      <VideoPlayer source={currentVideo?.videoUrl} />
+      <RecipeOverlay recipe={currentVideo} />
+    </SwipeableView>
+  );
+}
+```
+
+### 3.2 Recipe Collection Management
+
+**User Story**: "As a home cook, I want to organize my saved recipes into collections so I can easily find them later."
+
+Data Structure:
+
+```typescript
+interface Collection {
+  id: string;
+  userId: string;
+  name: string;
+  videos: VideoCard[];
+  lastUpdated: Timestamp;
+}
+
+// Firestore schema ensures efficient querying
+collections/{collectionId}/videos/{videoId}
+```
+
+### 3.3 Recipe Information Display
+
+**User Story**: "As a home cook, I want to see key information about each recipe while watching, so I can make quick decisions about saving it."
+
+Implementation:
+
+- Overlay displays during video playback
+- Shows cuisine, cooking time, and difficulty
+- Smooth fade in/out animations
+- Non-intrusive positioning
+
+### 3.4 Video Playback Controls
+
+**User Story**: "As a home cook, I want basic video controls so I can pause and rewatch parts of recipes I find interesting."
+
+Features:
+
+- Play/pause toggle
+- Progress bar
+- Mute/unmute
+- Replay button
+- Automatic playback for next video
+
+### 3.5 Saved Recipe Organization
+
+**User Story**: "As a home cook, I want to filter and sort my saved recipes by various criteria so I can find the right recipe for any occasion."
+
+Filtering Options:
+
+- Cuisine type
+- Cooking time
+- Difficulty level
+- Recently saved
+
+### 3.6 Recipe Details View
+
+**User Story**: "As a home cook, I want to see full recipe details for my saved videos, including ingredients and steps."
+
+Information Display:
+
+- Complete ingredient list
+- Basic instructions
+- Cooking tips
+- Share functionality
+
+## 4. Technical Architecture
+
+### Frontend (Next.js PWA)
+
+- Progressive Web App for cross-platform access
+- Framer Motion for smooth swipe animations
+- React Player for video playback
+- TailwindCSS for responsive design
+
+### Backend (Firebase)
+
+- Authentication: Firebase Auth
+- Database: Firestore
+- Storage: Firebase Storage
+- Hosting: Firebase Hosting
+
+Data Model:
+
+```typescript
+// Firebase Collections Structure
+
+// Videos collection
+interface Video {
+  id: string;
+  uploaderId: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  title: string;
+  description: string;
+  cuisine: string;
+  cookingTime: number;
+  difficulty: string;
+  ingredients: string[];
+  instructions: string[];
+  createdAt: Timestamp;
+}
+
+// User preferences and saved videos
+interface UserData {
+  id: string;
+  savedVideos: string[];
+  collections: {
+    id: string;
+    name: string;
+    videos: string[];
+  }[];
+  preferences: {
+    cuisines: string[];
+    maxCookingTime?: number;
+    difficulty?: string;
+  };
+}
+```
+
+## 5. Development Milestones
+
+### Day 1-2: Core Video Experience
+
+- Set up Next.js project with Firebase
+- Implement video player component
+- Create swipe interaction mechanics
+- Build basic data fetching
+
+### Day 3-4: Saved Recipes & Collections
+
+- Implement save functionality
+- Create collections management
+- Build filtering system
+- Design and implement recipe details view
+
+### Day 5: Polish & Testing
+
+- Add loading states
+- Implement error handling
+- Optimize performance
+- Add offline support
+- Test on multiple devices
+
+### Day 6: Deployment & Documentation
+
+- Deploy to Firebase Hosting
+- Complete documentation
+- Record demo video
+- Submit deliverables
+
+## 6. Success Metrics
+
+### Technical Requirements
+
+- Video start time < 2 seconds
+- Smooth swipe animations (60fps)
+- Offline functionality for saved recipes
+- PWA installable on mobile devices
+
+### User Experience Goals
+
+- Clear, intuitive swipe mechanics
+- Visible recipe information
+- Easy collection management
+- Quick save/organize workflow
+
+### Performance Targets
+
+- Time to Interactive < 3 seconds
+- First Contentful Paint < 1.5 seconds
+- Lighthouse Performance Score > 90
+- PWA Score > 95
+
+## 7. Future Enhancements (Week 2)
+
+While out of scope for the MVP, these features are planned for Week 2:
+
+- AI-powered recipe categorization
+- Automatic difficulty assessment
+- Ingredient recognition
+- Personalized recommendations
+- Smart recipe collections
+
+---
+
+*Document Version: 3.0*
+*Last Updated: February 3, 2025*
+*Author: Development Team*

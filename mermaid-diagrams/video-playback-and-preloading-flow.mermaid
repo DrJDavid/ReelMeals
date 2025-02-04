@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant U as User
+    participant VI as Video Interface
+    participant PM as Playback Manager
+    participant PC as Preload Cache
+    participant FS as Firebase Storage
+    
+    U->>VI: Views video
+    VI->>PM: Initialize playback
+    PM->>FS: Request current video
+    FS-->>PM: Return video stream
+    PM->>VI: Begin playback
+    
+    Note over PM,PC: Start preloading at 70% progress
+    
+    PM->>PC: Check cache for next video
+    alt Next video in cache
+        PC-->>PM: Return cached video
+    else Cache miss
+        PM->>FS: Request next video
+        FS-->>PM: Return video stream
+        PM->>PC: Cache video
+    end
+    
+    Note over VI,PM: Current video ends
+    
+    VI->>PM: Switch to next video
+    PM->>PC: Get preloaded video
+    PC-->>PM: Return video
+    PM->>VI: Begin playback immediately
+    
+    Note over PM,FS: Repeat preload cycle

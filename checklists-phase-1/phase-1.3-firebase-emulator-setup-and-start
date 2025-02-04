@@ -1,0 +1,17 @@
+Initialize Firebase Emulators: Run the Firebase emulator initialization command in your project root.
+
+(Command: firebase init emulators)
+
+(Follow the prompts to select which emulators to initialize - at least Firestore, Authentication, and Storage are needed)
+
+Start Firebase Emulators: Start the Firebase emulators.
+
+(Command: firebase emulators:start)
+
+(Leave this command running in a separate terminal window)
+
+Verify Emulator UI: Open your browser and navigate to the Firebase Emulator UI to verify the emulators are running.
+
+(URL: http://localhost:4000)
+
+(Check that Firestore, Authentication, and Storage are listed as running)

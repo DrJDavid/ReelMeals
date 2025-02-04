@@ -1,0 +1,17 @@
+---
+description: 
+globs: src/features/video-player/**/*
+---
+
+rules:
+  - "Use hardware acceleration when available through videojs-contrib-quality-levels"
+  - "Implement adaptive bitrate streaming with at least 3 quality levels"
+  - "Always preload next video when current video is 70% complete"
+
+examples:
+  - "src/features/video-player/examples/adaptive-streaming.tsx"
+  - "src/features/video-player/examples/preload-implementation.tsx"
+
+commands:
+  test: "npm run test:video"
+  benchmark: "npm run benchmark:video-playback"

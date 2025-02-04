@@ -1,0 +1,11 @@
+---
+description: 
+globs: src/features/state/**/*
+---
+rules:
+  - "Use Firebase Real-time Database for video progress sync"
+  - "Implement offline support using IndexedDB"
+  - "Cache video metadata but not video content"
+
+commands:
+  generate_types: "npm run codegen:firebase-types"

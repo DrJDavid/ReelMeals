@@ -1,0 +1,9 @@
+Add Development Scripts to package.json: Add the development-related scripts to the scripts section in your package.json file.
+
+(Scripts: dev, build, start, lint, emulators, dev:emulator, test, test:watch, cypress, cypress:headless as listed in docs/setup/development.md)
+
+Create .vscode/settings.json: Create a folder named .vscode in your project root and inside it create a file named settings.json.
+
+Add VS Code Settings to .vscode/settings.json: Add the recommended VS Code settings to settings.json as outlined in docs/setup/development.md.
+
+(Settings include formatter, format on save, code actions on save, TypeScript SDK settings)

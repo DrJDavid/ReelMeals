@@ -1,0 +1,28 @@
+Verify Node.js Version: Ensure you have Node.js version >= 18.0.0 installed.
+
+(Command: node -v)
+
+Verify npm Version: Ensure you have npm version >= 9.0.0 installed.
+
+(Command: npm -v)
+
+Install Firebase CLI Globally: Install the Firebase CLI globally using npm.
+
+(Command: npm install -g firebase-tools)
+
+Verify Firebase CLI Version: Ensure Firebase CLI version >= 12.0.0 is installed.
+
+(Command: firebase --version)
+
+Clone Git Repository: Clone your ReelMeals repository from GitHub to your local machine.
+
+(Command: git clone <repository_url>)
+
+Navigate to Project Directory: Change your current directory to the cloned ReelMeals project folder.
+
+(Command: cd drjdavid-reelmeals)
+
+Install Project Dependencies: Install all project dependencies using npm.
+
+(Command: npm install)
+

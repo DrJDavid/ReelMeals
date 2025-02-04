@@ -1,0 +1,18 @@
+# .cursorrules
+project:
+  name: "ReelMeals"
+  description: "High-performance video discovery platform"
+  tech_stack: "Next.js, Firebase, TypeScript"
+
+global_standards:
+  - "Use Firebase SDK v9 or higher for all Firebase interactions"
+  - "All video components must implement error boundaries"
+  - "Performance monitoring is required for all user-facing features"
+
+performance_baselines:
+  - "Time to First Frame < 2s"
+  - "Target 60fps for all animations"
+  - "Memory usage < 100MB on mobile devices"
+
+terminal_rules:
+  - "Use powershell commands in the terminal"

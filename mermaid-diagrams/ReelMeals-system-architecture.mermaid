@@ -1,0 +1,45 @@
+flowchart TB
+    subgraph Client ["Client Layer (Next.js PWA)"]
+        VP[Video Player Component]
+        SI[Swipe Interface]
+        CM[Collection Manager]
+        SM[State Manager]
+    end
+
+    subgraph Firebase ["Firebase Services"]
+        direction TB
+        Auth[Authentication]
+        FS[Cloud Firestore]
+        Storage[Cloud Storage]
+        Functions[Cloud Functions]
+    end
+
+    subgraph Cache ["Client-Side Cache"]
+        IndexDB[IndexedDB]
+        LocalStorage[Local Storage]
+        VideoCache[Video Cache]
+    end
+
+    %% Client to Firebase connections
+    VP --> Storage
+    VP --> Functions
+    SI --> FS
+    CM --> FS
+    SM --> Auth
+    SM --> FS
+
+    %% Cache connections
+    VP --> VideoCache
+    CM --> IndexDB
+    SM --> LocalStorage
+
+    %% Service Worker
+    SW[Service Worker] --> Cache
+    SW --> Firebase
+
+    classDef firebase fill:#039BE5,color:white
+    classDef client fill:#81C784,color:white
+    classDef cache fill:#FFB74D,color:white
+    class Auth,FS,Storage,Functions firebase
+    class VP,SI,CM,SM client
+    class IndexDB,LocalStorage,VideoCache,SW cache

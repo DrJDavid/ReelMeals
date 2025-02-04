@@ -1,0 +1,16 @@
+---
+description: 
+globs: src/features/swipe/**/*
+---
+rules:
+  - "Use CSS transforms exclusively for animations"
+  - "Implement velocity-based gestures using @use-gesture/react"
+  - "Handle multi-touch scenarios gracefully"
+
+performance_metrics:
+  - "Touch response < 16ms"
+  - "Animation frame budget: 16ms"
+  
+error_handling:
+  - "Provide fallback UI for touch-unsupported devices"
+  - "Reset gesture state on error"

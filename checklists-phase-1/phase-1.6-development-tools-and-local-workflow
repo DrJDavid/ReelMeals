@@ -1,0 +1,13 @@
+Install VS Code Extensions: Install the recommended VS Code extensions.
+
+(Extensions: ESLint, Prettier, Firebase Explorer, Jest Runner, GitLens, Tailwind CSS IntelliSense)
+
+Start Development Server with Emulators: Run the combined development and emulator start script.
+
+(Command: npm run dev:emulator)
+
+Verify Development Environment Access: Access the development environment in your browser to ensure Next.js is running.
+
+(URL: http://localhost:3000)
+
+(Check for any initial errors in the browser console or terminal)

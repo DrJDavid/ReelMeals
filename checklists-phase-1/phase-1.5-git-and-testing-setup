@@ -1,0 +1,9 @@
+Create .gitignore File: Create a file named .gitignore in your project root.
+
+Add .gitignore Content: Add the content for your .gitignore file as provided in docs/setup/development.md.
+
+(This includes ignoring node_modules, .next, environment files, Firebase emulator files, IDE files, etc.)
+
+Configure Jest in jest.config.js: Verify or create jest.config.js and configure it as described in docs/setup/development.md.
+
+(Ensure setupFilesAfterEnv, moduleNameMapper, and testEnvironment are correctly configured)

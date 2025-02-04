@@ -1,0 +1,479 @@
+# Firebase Configuration Guide
+
+## Overview
+
+This guide provides comprehensive instructions for configuring Firebase services for ReelMeals. Our application uses multiple Firebase services including Authentication, Firestore, Storage, and Cloud Functions to provide a seamless video sharing and discovery platform.
+
+## Initial Project Setup
+
+First, create a new Firebase project:
+
+1. Navigate to the Firebase Console
+2. Create a new project named "ReelMeals"
+3. Enable Google Analytics
+4. Choose your preferred settings for data sharing and analytics
+
+## Service Configuration
+
+### Authentication Setup
+
+Configure authentication with secure settings:
+
+```typescript
+// src/config/auth.ts
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { app } from './firebase';
+
+const auth = getAuth(app);
+
+// Configure authentication settings
+const configureAuth = () => {
+  auth.useDeviceLanguage();
+  auth.settings.appVerificationDisabledForTesting = false;
+  
+  // Enable session persistence
+  auth.setPersistence('LOCAL');
+  
+  // Configure authentication providers
+  const providers = {
+    google: new GoogleAuthProvider(),
+    email: new EmailAuthProvider(),
+  };
+  
+  // Add custom scopes for Google Sign-in
+  providers.google.addScope('https://www.googleapis.com/auth/userinfo.profile');
+  
+  return { auth, providers };
+};
+
+// Custom hook for authentication state
+export const useAuth = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      setUser(user);
+      setLoading(false);
+    });
+    
+    return unsubscribe;
+  }, []);
+  
+  return { user, loading };
+};
+```
+
+### Firestore Configuration
+
+Set up Firestore with optimized settings for video metadata:
+
+```typescript
+// src/config/firestore.ts
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { app } from './firebase';
+
+const db = getFirestore(app);
+
+// Configure Firestore settings for optimal performance
+const configureFirestore = () => {
+  const settings = {
+    cacheSizeBytes: 1048576 * 100, // 100MB cache size
+    ignoreUndefinedProperties: true,
+    experimentalForceLongPolling: false,
+    experimentalAutoDetectLongPolling: true,
+  };
+  
+  db.settings(settings);
+  
+  return db;
+};
+
+// Custom hook for real-time data
+export const useFirestoreDoc = <T>(
+  path: string,
+  transform?: (data: any) => T
+) => {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  useEffect(() => {
+    const unsubscribe = db.doc(path).onSnapshot(
+      doc => {
+        const docData = doc.data();
+        setData(transform ? transform(docData) : docData);
+        setLoading(false);
+      },
+      error => {
+        setError(error);
+        setLoading(false);
+      }
+    );
+    
+    return unsubscribe;
+  }, [path, transform]);
+  
+  return { data, loading, error };
+};
+```
+
+### Storage Configuration
+
+Configure Storage for efficient video handling:
+
+```typescript
+// src/config/storage.ts
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
+import { app } from './firebase';
+
+const storage = getStorage(app);
+
+// Configure storage settings for video optimization
+const configureStorage = () => {
+  // Set up CORS configuration
+  const corsConfig = {
+    origin: [
+      'localhost:3000',
+      'reelmeals.app'
+    ],
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'],
+    maxAgeSeconds: 3600
+  };
+  
+  // Configure cache control
+  const cacheControl = {
+    videos: 'public, max-age=86400',     // 24 hours
+    thumbnails: 'public, max-age=604800'  // 1 week
+  };
+  
+  return { storage, corsConfig, cacheControl };
+};
+
+// Video upload helper
+export const uploadVideo = async (
+  file: File,
+  metadata: VideoMetadata
+): Promise<string> => {
+  const timestamp = Date.now();
+  const filename = `videos/${metadata.userId}/${timestamp}_${file.name}`;
+  const storageRef = ref(storage, filename);
+  
+  // Set custom metadata
+  const customMetadata = {
+    contentType: 'video/mp4',
+    cacheControl: cacheControl.videos,
+    customMetadata: {
+      userId: metadata.userId,
+      title: metadata.title,
+      description: metadata.description
+    }
+  };
+  
+  // Upload with progress monitoring
+  const uploadTask = uploadBytesResumable(
+    storageRef,
+    file,
+    customMetadata
+  );
+  
+  return new Promise((resolve, reject) => {
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = 
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload progress: ${progress}%`);
+      },
+      (error) => reject(error),
+      async () => {
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        resolve(downloadURL);
+      }
+    );
+  });
+};
+```
+
+### Cloud Functions Setup
+
+Configure Cloud Functions for video processing:
+
+```typescript
+// src/config/functions.ts
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from './firebase';
+
+const functions = getFunctions(app);
+
+// Configure function settings
+const configureFunctions = () => {
+  // Set custom timeouts for video processing
+  functions.settings = {
+    timeoutSeconds: 540,  // 9 minutes
+    memory: '2GB'
+  };
+  
+  return functions;
+};
+
+// Video processing function
+export const processVideo = httpsCallable(
+  functions,
+  'processVideo'
+);
+
+// Example usage
+const handleVideoProcessing = async (videoId: string) => {
+  try {
+    const result = await processVideo({ videoId });
+    return result.data;
+  } catch (error) {
+    console.error('Video processing failed:', error);
+    throw error;
+  }
+};
+```
+
+## Security Rules
+
+### Firestore Security Rules
+
+```typescript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidVideo() {
+      return request.resource.data.keys().hasAll([
+        'title',
+        'description',
+        'userId',
+        'createdAt'
+      ]);
+    }
+    
+    // Video collection rules
+    match /videos/{videoId} {
+      allow read: if true;
+      allow create: if isAuthenticated() 
+        && isOwner(request.resource.data.userId)
+        && isValidVideo();
+      allow update, delete: if isAuthenticated() 
+        && isOwner(resource.data.userId);
+    }
+    
+    // User collection rules
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId);
+      
+      // User's private collections
+      match /collections/{collectionId} {
+        allow read, write: if isAuthenticated() && isOwner(userId);
+      }
+    }
+  }
+}
+```
+
+### Storage Security Rules
+
+```typescript
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidVideoType() {
+      return request.resource.contentType.matches('video/.*');
+    }
+    
+    // Video upload rules
+    match /videos/{userId}/{videoId} {
+      allow read: if true;
+      allow create: if isAuthenticated() 
+        && isOwner(userId)
+        && isValidVideoType()
+        && request.resource.size < 500 * 1024 * 1024; // 500MB limit
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+    
+    // Thumbnail rules
+    match /thumbnails/{userId}/{thumbnailId} {
+      allow read: if true;
+      allow write: if isAuthenticated() && isOwner(userId);
+    }
+  }
+}
+```
+
+## Performance Optimization
+
+### Firestore Optimization
+
+```typescript
+// src/config/optimization.ts
+// Configure Firestore caching and offline persistence
+enableIndexedDbPersistence(db, {
+  synchronizeTabs: true,
+  cacheSizeBytes: 1048576 * 100 // 100MB cache
+}).catch((err) => {
+  if (err.code == 'failed-precondition') {
+    // Multiple tabs open, persistence can only be enabled in one tab
+    enableMultiTabIndexedDbPersistence(db);
+  } else if (err.code == 'unimplemented') {
+    // Browser doesn't support persistence
+    console.warn('Persistence not supported');
+  }
+});
+
+// Configure query optimizations
+const optimizeQueries = {
+  // Paginated video fetching
+  paginatedVideos: (lastDoc?: QueryDocumentSnapshot) => {
+    let query = db.collection('videos')
+      .orderBy('createdAt', 'desc')
+      .limit(10);
+      
+    if (lastDoc) {
+      query = query.startAfter(lastDoc);
+    }
+    
+    return query;
+  },
+  
+  // Efficient user video fetching
+  userVideos: (userId: string) => {
+    return db.collection('videos')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .withConverter(videoConverter);
+  }
+};
+```
+
+### Storage Optimization
+
+```typescript
+// Configure video processing options
+const videoProcessingConfig = {
+  transcoding: {
+    maxHeight: 1920,
+    maxWidth: 1080,
+    videoBitrate: '2500k',
+    audioBitrate: '128k',
+    format: 'mp4'
+  },
+  thumbnails: {
+    sizes: [
+      { width: 320, height: 180 },
+      { width: 640, height: 360 },
+      { width: 1280, height: 720 }
+    ],
+    format: 'webp'
+  },
+  streaming: {
+    segmentDuration: 6,
+    playlistSize: 5
+  }
+};
+
+// Configure CDN caching
+const cdnConfig = {
+  cacheControl: {
+    videos: 'public, max-age=86400',     // 24 hours
+    thumbnails: 'public, max-age=604800', // 1 week
+    metadata: 'public, max-age=3600'      // 1 hour
+  },
+  cors: ['*']
+};
+```
+
+## Monitoring and Analytics
+
+### Firebase Analytics Configuration
+
+```typescript
+// src/config/analytics.ts
+import { getAnalytics, logEvent } from 'firebase/analytics';
+import { app } from './firebase';
+
+const analytics = getAnalytics(app);
+
+// Configure custom events
+const videoEvents = {
+  videoStart: (videoId: string) => {
+    logEvent(analytics, 'video_start', {
+      video_id: videoId,
+      timestamp: Date.now()
+    });
+  },
+  
+  videoComplete: (videoId: string, watchTime: number) => {
+    logEvent(analytics, 'video_complete', {
+      video_id: videoId,
+      watch_time: watchTime,
+      timestamp: Date.now()
+    });
+  }
+};
+
+// Configure user properties
+const setUserProperties = (user: User) => {
+  setUserProperty(analytics, 'user_type', user.type);
+  setUserProperty(analytics, 'account_age', user.accountAge);
+};
+```
+
+## Error Handling
+
+```typescript
+// src/config/errorHandling.ts
+// Configure error reporting
+const errorReporter = {
+  logError: (error: Error, context?: any) => {
+    console.error('Firebase Error:', error);
+    
+    if (process.env.NODE_ENV === 'production') {
+      // Log to error reporting service
+      logErrorToService(error, context);
+    }
+  },
+  
+  handleAuthError: (error: AuthError) => {
+    switch (error.code) {
+      case 'auth/invalid-email':
+        return 'Invalid email address';
+      case 'auth/user-disabled':
+        return 'Account has been disabled';
+      case 'auth/user-not-found':
+        return 'User not found';
+      default:
+        return 'Authentication failed';
+    }
+  }
+};
+```
+
+This comprehensive Firebase configuration guide ensures optimal setup for video handling, security, and performance in the ReelMeals application.
+
+---
+
+*Version: 1.0.0*
+*Last Updated: February 3, 2025*
