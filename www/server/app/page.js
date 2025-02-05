@@ -56,6 +56,171 @@ module.exports = require("next/dist/compiled/next-server/app-page.runtime.dev.js
 
 /***/ }),
 
+/***/ "crypto":
+/*!*************************!*\
+  !*** external "crypto" ***!
+  \*************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("crypto");
+
+/***/ }),
+
+/***/ "dns":
+/*!**********************!*\
+  !*** external "dns" ***!
+  \**********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("dns");
+
+/***/ }),
+
+/***/ "events":
+/*!*************************!*\
+  !*** external "events" ***!
+  \*************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("events");
+
+/***/ }),
+
+/***/ "fs":
+/*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("fs");
+
+/***/ }),
+
+/***/ "http":
+/*!***********************!*\
+  !*** external "http" ***!
+  \***********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("http");
+
+/***/ }),
+
+/***/ "http2":
+/*!************************!*\
+  !*** external "http2" ***!
+  \************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("http2");
+
+/***/ }),
+
+/***/ "net":
+/*!**********************!*\
+  !*** external "net" ***!
+  \**********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("net");
+
+/***/ }),
+
+/***/ "os":
+/*!*********************!*\
+  !*** external "os" ***!
+  \*********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("os");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("path");
+
+/***/ }),
+
+/***/ "process":
+/*!**************************!*\
+  !*** external "process" ***!
+  \**************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("process");
+
+/***/ }),
+
+/***/ "stream":
+/*!*************************!*\
+  !*** external "stream" ***!
+  \*************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("stream");
+
+/***/ }),
+
+/***/ "tls":
+/*!**********************!*\
+  !*** external "tls" ***!
+  \**********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("tls");
+
+/***/ }),
+
+/***/ "url":
+/*!**********************!*\
+  !*** external "url" ***!
+  \**********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("url");
+
+/***/ }),
+
+/***/ "util":
+/*!***********************!*\
+  !*** external "util" ***!
+  \***********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("util");
+
+/***/ }),
+
+/***/ "zlib":
+/*!***********************!*\
+  !*** external "zlib" ***!
+  \***********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("zlib");
+
+/***/ }),
+
 /***/ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=export&preferredRegion=&middlewareConfig=e30%3D!":
 /*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=export&preferredRegion=&middlewareConfig=e30%3D! ***!
@@ -77,13 +242,13 @@ eval("Promise.resolve(/*! import() eager */).then(__webpack_require__.t.bind(__w
 
 /***/ }),
 
-/***/ "(ssr)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Cgoogle%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22src%5C%5C%5C%5Capp%5C%5C%5C%5Clayout.tsx%5C%22%2C%5C%22import%5C%22%3A%5C%22Inter%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22subsets%5C%22%3A%5B%5C%22latin%5C%22%5D%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22inter%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cstyles%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&server=true!":
-/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Cgoogle%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22src%5C%5C%5C%5Capp%5C%5C%5C%5Clayout.tsx%5C%22%2C%5C%22import%5C%22%3A%5C%22Inter%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22subsets%5C%22%3A%5B%5C%22latin%5C%22%5D%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22inter%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cstyles%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&server=true! ***!
-  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ (() => {
+/***/ "(ssr)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Cgoogle%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22src%5C%5C%5C%5Capp%5C%5C%5C%5Clayout.tsx%5C%22%2C%5C%22import%5C%22%3A%5C%22Inter%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22subsets%5C%22%3A%5B%5C%22latin%5C%22%5D%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22inter%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cfeatures%5C%5Cauth%5C%5CAuthContext.tsx%22%2C%22ids%22%3A%5B%22AuthProvider%22%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cstyles%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&server=true!":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Cgoogle%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22src%5C%5C%5C%5Capp%5C%5C%5C%5Clayout.tsx%5C%22%2C%5C%22import%5C%22%3A%5C%22Inter%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22subsets%5C%22%3A%5B%5C%22latin%5C%22%5D%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22inter%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cfeatures%5C%5Cauth%5C%5CAuthContext.tsx%22%2C%22ids%22%3A%5B%22AuthProvider%22%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cstyles%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&server=true! ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-
+eval("Promise.resolve(/*! import() eager */).then(__webpack_require__.bind(__webpack_require__, /*! ./src/features/auth/AuthContext.tsx */ \"(ssr)/./src/features/auth/AuthContext.tsx\"));\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9ub2RlX21vZHVsZXMvbmV4dC9kaXN0L2J1aWxkL3dlYnBhY2svbG9hZGVycy9uZXh0LWZsaWdodC1jbGllbnQtZW50cnktbG9hZGVyLmpzP21vZHVsZXM9JTdCJTIycmVxdWVzdCUyMiUzQSUyMkMlM0ElNUMlNUNVc2VycyU1QyU1Q2RhdmlkJTVDJTVDZ2F1bnRsZXQtYWklNUMlNUNwcm9qZWN0cyU1QyU1Q3JlZWxtZWFscyU1QyU1Q25vZGVfbW9kdWxlcyU1QyU1Q25leHQlNUMlNUNmb250JTVDJTVDZ29vZ2xlJTVDJTVDdGFyZ2V0LmNzcyUzRiU3QiU1QyUyMnBhdGglNUMlMjIlM0ElNUMlMjJzcmMlNUMlNUMlNUMlNUNhcHAlNUMlNUMlNUMlNUNsYXlvdXQudHN4JTVDJTIyJTJDJTVDJTIyaW1wb3J0JTVDJTIyJTNBJTVDJTIySW50ZXIlNUMlMjIlMkMlNUMlMjJhcmd1bWVudHMlNUMlMjIlM0ElNUIlN0IlNUMlMjJzdWJzZXRzJTVDJTIyJTNBJTVCJTVDJTIybGF0aW4lNUMlMjIlNUQlN0QlNUQlMkMlNUMlMjJ2YXJpYWJsZU5hbWUlNUMlMjIlM0ElNUMlMjJpbnRlciU1QyUyMiU3RCUyMiUyQyUyMmlkcyUyMiUzQSU1QiU1RCU3RCZtb2R1bGVzPSU3QiUyMnJlcXVlc3QlMjIlM0ElMjJDJTNBJTVDJTVDVXNlcnMlNUMlNUNkYXZpZCU1QyU1Q2dhdW50bGV0LWFpJTVDJTVDcHJvamVjdHMlNUMlNUNyZWVsbWVhbHMlNUMlNUNzcmMlNUMlNUNmZWF0dXJlcyU1QyU1Q2F1dGglNUMlNUNBdXRoQ29udGV4dC50c3glMjIlMkMlMjJpZHMlMjIlM0ElNUIlMjJBdXRoUHJvdmlkZXIlMjIlNUQlN0QmbW9kdWxlcz0lN0IlMjJyZXF1ZXN0JTIyJTNBJTIyQyUzQSU1QyU1Q1VzZXJzJTVDJTVDZGF2aWQlNUMlNUNnYXVudGxldC1haSU1QyU1Q3Byb2plY3RzJTVDJTVDcmVlbG1lYWxzJTVDJTVDc3JjJTVDJTVDc3R5bGVzJTVDJTVDZ2xvYmFscy5jc3MlMjIlMkMlMjJpZHMlMjIlM0ElNUIlNUQlN0Qmc2VydmVyPXRydWUhIiwibWFwcGluZ3MiOiJBQUFBLGtMQUErSiIsInNvdXJjZXMiOlsid2VicGFjazovL3JlZWxtZWFscy8/ZWViNSJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQoLyogd2VicGFja01vZGU6IFwiZWFnZXJcIiwgd2VicGFja0V4cG9ydHM6IFtcIkF1dGhQcm92aWRlclwiXSAqLyBcIkM6XFxcXFVzZXJzXFxcXGRhdmlkXFxcXGdhdW50bGV0LWFpXFxcXHByb2plY3RzXFxcXHJlZWxtZWFsc1xcXFxzcmNcXFxcZmVhdHVyZXNcXFxcYXV0aFxcXFxBdXRoQ29udGV4dC50c3hcIik7XG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(ssr)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Cnode_modules%5C%5Cnext%5C%5Cfont%5C%5Cgoogle%5C%5Ctarget.css%3F%7B%5C%22path%5C%22%3A%5C%22src%5C%5C%5C%5Capp%5C%5C%5C%5Clayout.tsx%5C%22%2C%5C%22import%5C%22%3A%5C%22Inter%5C%22%2C%5C%22arguments%5C%22%3A%5B%7B%5C%22subsets%5C%22%3A%5B%5C%22latin%5C%22%5D%7D%5D%2C%5C%22variableName%5C%22%3A%5C%22inter%5C%22%7D%22%2C%22ids%22%3A%5B%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cfeatures%5C%5Cauth%5C%5CAuthContext.tsx%22%2C%22ids%22%3A%5B%22AuthProvider%22%5D%7D&modules=%7B%22request%22%3A%22C%3A%5C%5CUsers%5C%5Cdavid%5C%5Cgauntlet-ai%5C%5Cprojects%5C%5Creelmeals%5C%5Csrc%5C%5Cstyles%5C%5Cglobals.css%22%2C%22ids%22%3A%5B%5D%7D&server=true!\n");
 
 /***/ }),
 
@@ -141,6 +306,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+/***/ "(ssr)/./src/features/auth/AuthContext.tsx":
+/*!*******************************************!*\
+  !*** ./src/features/auth/AuthContext.tsx ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   AuthProvider: () => (/* binding */ AuthProvider),\n/* harmony export */   useAuth: () => (/* binding */ useAuth)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/lib/firebase/initFirebase */ \"(ssr)/./src/lib/firebase/initFirebase.ts\");\n/* harmony import */ var firebase_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! firebase/auth */ \"(ssr)/./node_modules/firebase/auth/dist/index.mjs\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react */ \"(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react.js\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_3__);\n/* __next_internal_client_entry_do_not_use__ AuthProvider,useAuth auto */ \n\n\n\nconst AuthContext = /*#__PURE__*/ (0,react__WEBPACK_IMPORTED_MODULE_3__.createContext)(undefined);\nfunction AuthProvider({ children }) {\n    const [user, setUser] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(null);\n    const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(true);\n    const [error, setError] = (0,react__WEBPACK_IMPORTED_MODULE_3__.useState)(null);\n    // Listen to auth state changes\n    (0,react__WEBPACK_IMPORTED_MODULE_3__.useEffect)(()=>{\n        const unsubscribe = (0,firebase_auth__WEBPACK_IMPORTED_MODULE_2__.onAuthStateChanged)(_lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__.firebaseAuth, (user)=>{\n            setUser(user);\n            setLoading(false);\n        });\n        return ()=>unsubscribe();\n    }, []);\n    // Sign up with email/password\n    const signUp = async (email, password)=>{\n        try {\n            setError(null);\n            const result = await (0,firebase_auth__WEBPACK_IMPORTED_MODULE_2__.createUserWithEmailAndPassword)(_lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__.firebaseAuth, email, password);\n            setUser(result.user);\n        } catch (err) {\n            setError(err);\n            throw err;\n        }\n    };\n    // Sign in with email/password\n    const signIn = async (email, password)=>{\n        try {\n            setError(null);\n            const result = await (0,firebase_auth__WEBPACK_IMPORTED_MODULE_2__.signInWithEmailAndPassword)(_lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__.firebaseAuth, email, password);\n            setUser(result.user);\n        } catch (err) {\n            setError(err);\n            throw err;\n        }\n    };\n    // Sign in with Google\n    const signInWithGoogle = async ()=>{\n        try {\n            setError(null);\n            const provider = new firebase_auth__WEBPACK_IMPORTED_MODULE_2__.GoogleAuthProvider();\n            const result = await (0,firebase_auth__WEBPACK_IMPORTED_MODULE_2__.signInWithPopup)(_lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__.firebaseAuth, provider);\n            setUser(result.user);\n        } catch (err) {\n            setError(err);\n            throw err;\n        }\n    };\n    // Sign out\n    const logout = async ()=>{\n        try {\n            setError(null);\n            await (0,firebase_auth__WEBPACK_IMPORTED_MODULE_2__.signOut)(_lib_firebase_initFirebase__WEBPACK_IMPORTED_MODULE_1__.firebaseAuth);\n            setUser(null);\n        } catch (err) {\n            setError(err);\n            throw err;\n        }\n    };\n    const value = {\n        user,\n        loading,\n        error,\n        signUp,\n        signIn,\n        signInWithGoogle,\n        logout\n    };\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(AuthContext.Provider, {\n        value: value,\n        children: children\n    }, void 0, false, {\n        fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\features\\\\auth\\\\AuthContext.tsx\",\n        lineNumber: 115,\n        columnNumber: 10\n    }, this);\n}\nfunction useAuth() {\n    const context = (0,react__WEBPACK_IMPORTED_MODULE_3__.useContext)(AuthContext);\n    if (context === undefined) {\n        throw new Error(\"useAuth must be used within an AuthProvider\");\n    }\n    return context;\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9zcmMvZmVhdHVyZXMvYXV0aC9BdXRoQ29udGV4dC50c3giLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBRTJEO0FBU3BDO0FBT1I7QUFZZixNQUFNVyw0QkFBY0osb0RBQWFBLENBQThCSztBQUV4RCxTQUFTQyxhQUFhLEVBQUVDLFFBQVEsRUFBMkI7SUFDaEUsTUFBTSxDQUFDQyxNQUFNQyxRQUFRLEdBQUdOLCtDQUFRQSxDQUFjO0lBQzlDLE1BQU0sQ0FBQ08sU0FBU0MsV0FBVyxHQUFHUiwrQ0FBUUEsQ0FBQztJQUN2QyxNQUFNLENBQUNTLE9BQU9DLFNBQVMsR0FBR1YsK0NBQVFBLENBQWU7SUFFakQsK0JBQStCO0lBQy9CRCxnREFBU0EsQ0FBQztRQUNSLE1BQU1ZLGNBQWNsQixpRUFBa0JBLENBQUNILG9FQUFZQSxFQUFFLENBQUNlO1lBQ3BEQyxRQUFRRDtZQUNSRyxXQUFXO1FBQ2I7UUFFQSxPQUFPLElBQU1HO0lBQ2YsR0FBRyxFQUFFO0lBRUwsOEJBQThCO0lBQzlCLE1BQU1DLFNBQVMsT0FBT0MsT0FBZUM7UUFDbkMsSUFBSTtZQUNGSixTQUFTO1lBQ1QsTUFBTUssU0FBUyxNQUFNeEIsNkVBQThCQSxDQUNqREQsb0VBQVlBLEVBQ1p1QixPQUNBQztZQUVGUixRQUFRUyxPQUFPVixJQUFJO1FBQ3JCLEVBQUUsT0FBT1csS0FBSztZQUNaTixTQUFTTTtZQUNULE1BQU1BO1FBQ1I7SUFDRjtJQUVBLDhCQUE4QjtJQUM5QixNQUFNQyxTQUFTLE9BQU9KLE9BQWVDO1FBQ25DLElBQUk7WUFDRkosU0FBUztZQUNULE1BQU1LLFNBQVMsTUFBTXJCLHlFQUEwQkEsQ0FDN0NKLG9FQUFZQSxFQUNadUIsT0FDQUM7WUFFRlIsUUFBUVMsT0FBT1YsSUFBSTtRQUNyQixFQUFFLE9BQU9XLEtBQUs7WUFDWk4sU0FBU007WUFDVCxNQUFNQTtRQUNSO0lBQ0Y7SUFFQSxzQkFBc0I7SUFDdEIsTUFBTUUsbUJBQW1CO1FBQ3ZCLElBQUk7WUFDRlIsU0FBUztZQUNULE1BQU1TLFdBQVcsSUFBSTNCLDZEQUFrQkE7WUFDdkMsTUFBTXVCLFNBQVMsTUFBTXBCLDhEQUFlQSxDQUFDTCxvRUFBWUEsRUFBRTZCO1lBQ25EYixRQUFRUyxPQUFPVixJQUFJO1FBQ3JCLEVBQUUsT0FBT1csS0FBSztZQUNaTixTQUFTTTtZQUNULE1BQU1BO1FBQ1I7SUFDRjtJQUVBLFdBQVc7SUFDWCxNQUFNSSxTQUFTO1FBQ2IsSUFBSTtZQUNGVixTQUFTO1lBQ1QsTUFBTWQsc0RBQU9BLENBQUNOLG9FQUFZQTtZQUMxQmdCLFFBQVE7UUFDVixFQUFFLE9BQU9VLEtBQUs7WUFDWk4sU0FBU007WUFDVCxNQUFNQTtRQUNSO0lBQ0Y7SUFFQSxNQUFNSyxRQUFRO1FBQ1poQjtRQUNBRTtRQUNBRTtRQUNBRztRQUNBSztRQUNBQztRQUNBRTtJQUNGO0lBRUEscUJBQU8sOERBQUNuQixZQUFZcUIsUUFBUTtRQUFDRCxPQUFPQTtrQkFBUWpCOzs7Ozs7QUFDOUM7QUFFTyxTQUFTbUI7SUFDZCxNQUFNQyxVQUFVMUIsaURBQVVBLENBQUNHO0lBQzNCLElBQUl1QixZQUFZdEIsV0FBVztRQUN6QixNQUFNLElBQUl1QixNQUFNO0lBQ2xCO0lBQ0EsT0FBT0Q7QUFDVCIsInNvdXJjZXMiOlsid2VicGFjazovL3JlZWxtZWFscy8uL3NyYy9mZWF0dXJlcy9hdXRoL0F1dGhDb250ZXh0LnRzeD8wNzY5Il0sInNvdXJjZXNDb250ZW50IjpbIlwidXNlIGNsaWVudFwiO1xyXG5cclxuaW1wb3J0IHsgZmlyZWJhc2VBdXRoIH0gZnJvbSBcIkAvbGliL2ZpcmViYXNlL2luaXRGaXJlYmFzZVwiO1xyXG5pbXBvcnQge1xyXG4gIGNyZWF0ZVVzZXJXaXRoRW1haWxBbmRQYXNzd29yZCxcclxuICBHb29nbGVBdXRoUHJvdmlkZXIsXHJcbiAgb25BdXRoU3RhdGVDaGFuZ2VkLFxyXG4gIHNpZ25JbldpdGhFbWFpbEFuZFBhc3N3b3JkLFxyXG4gIHNpZ25JbldpdGhQb3B1cCxcclxuICBzaWduT3V0LFxyXG4gIFVzZXIsXHJcbn0gZnJvbSBcImZpcmViYXNlL2F1dGhcIjtcclxuaW1wb3J0IHtcclxuICBjcmVhdGVDb250ZXh0LFxyXG4gIFJlYWN0Tm9kZSxcclxuICB1c2VDb250ZXh0LFxyXG4gIHVzZUVmZmVjdCxcclxuICB1c2VTdGF0ZSxcclxufSBmcm9tIFwicmVhY3RcIjtcclxuXHJcbmludGVyZmFjZSBBdXRoQ29udGV4dFR5cGUge1xyXG4gIHVzZXI6IFVzZXIgfCBudWxsO1xyXG4gIGxvYWRpbmc6IGJvb2xlYW47XHJcbiAgZXJyb3I6IEVycm9yIHwgbnVsbDtcclxuICBzaWduVXA6IChlbWFpbDogc3RyaW5nLCBwYXNzd29yZDogc3RyaW5nKSA9PiBQcm9taXNlPHZvaWQ+O1xyXG4gIHNpZ25JbjogKGVtYWlsOiBzdHJpbmcsIHBhc3N3b3JkOiBzdHJpbmcpID0+IFByb21pc2U8dm9pZD47XHJcbiAgc2lnbkluV2l0aEdvb2dsZTogKCkgPT4gUHJvbWlzZTx2b2lkPjtcclxuICBsb2dvdXQ6ICgpID0+IFByb21pc2U8dm9pZD47XHJcbn1cclxuXHJcbmNvbnN0IEF1dGhDb250ZXh0ID0gY3JlYXRlQ29udGV4dDxBdXRoQ29udGV4dFR5cGUgfCB1bmRlZmluZWQ+KHVuZGVmaW5lZCk7XHJcblxyXG5leHBvcnQgZnVuY3Rpb24gQXV0aFByb3ZpZGVyKHsgY2hpbGRyZW4gfTogeyBjaGlsZHJlbjogUmVhY3ROb2RlIH0pIHtcclxuICBjb25zdCBbdXNlciwgc2V0VXNlcl0gPSB1c2VTdGF0ZTxVc2VyIHwgbnVsbD4obnVsbCk7XHJcbiAgY29uc3QgW2xvYWRpbmcsIHNldExvYWRpbmddID0gdXNlU3RhdGUodHJ1ZSk7XHJcbiAgY29uc3QgW2Vycm9yLCBzZXRFcnJvcl0gPSB1c2VTdGF0ZTxFcnJvciB8IG51bGw+KG51bGwpO1xyXG5cclxuICAvLyBMaXN0ZW4gdG8gYXV0aCBzdGF0ZSBjaGFuZ2VzXHJcbiAgdXNlRWZmZWN0KCgpID0+IHtcclxuICAgIGNvbnN0IHVuc3Vic2NyaWJlID0gb25BdXRoU3RhdGVDaGFuZ2VkKGZpcmViYXNlQXV0aCwgKHVzZXIpID0+IHtcclxuICAgICAgc2V0VXNlcih1c2VyKTtcclxuICAgICAgc2V0TG9hZGluZyhmYWxzZSk7XHJcbiAgICB9KTtcclxuXHJcbiAgICByZXR1cm4gKCkgPT4gdW5zdWJzY3JpYmUoKTtcclxuICB9LCBbXSk7XHJcblxyXG4gIC8vIFNpZ24gdXAgd2l0aCBlbWFpbC9wYXNzd29yZFxyXG4gIGNvbnN0IHNpZ25VcCA9IGFzeW5jIChlbWFpbDogc3RyaW5nLCBwYXNzd29yZDogc3RyaW5nKSA9PiB7XHJcbiAgICB0cnkge1xyXG4gICAgICBzZXRFcnJvcihudWxsKTtcclxuICAgICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgY3JlYXRlVXNlcldpdGhFbWFpbEFuZFBhc3N3b3JkKFxyXG4gICAgICAgIGZpcmViYXNlQXV0aCxcclxuICAgICAgICBlbWFpbCxcclxuICAgICAgICBwYXNzd29yZFxyXG4gICAgICApO1xyXG4gICAgICBzZXRVc2VyKHJlc3VsdC51c2VyKTtcclxuICAgIH0gY2F0Y2ggKGVycikge1xyXG4gICAgICBzZXRFcnJvcihlcnIgYXMgRXJyb3IpO1xyXG4gICAgICB0aHJvdyBlcnI7XHJcbiAgICB9XHJcbiAgfTtcclxuXHJcbiAgLy8gU2lnbiBpbiB3aXRoIGVtYWlsL3Bhc3N3b3JkXHJcbiAgY29uc3Qgc2lnbkluID0gYXN5bmMgKGVtYWlsOiBzdHJpbmcsIHBhc3N3b3JkOiBzdHJpbmcpID0+IHtcclxuICAgIHRyeSB7XHJcbiAgICAgIHNldEVycm9yKG51bGwpO1xyXG4gICAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBzaWduSW5XaXRoRW1haWxBbmRQYXNzd29yZChcclxuICAgICAgICBmaXJlYmFzZUF1dGgsXHJcbiAgICAgICAgZW1haWwsXHJcbiAgICAgICAgcGFzc3dvcmRcclxuICAgICAgKTtcclxuICAgICAgc2V0VXNlcihyZXN1bHQudXNlcik7XHJcbiAgICB9IGNhdGNoIChlcnIpIHtcclxuICAgICAgc2V0RXJyb3IoZXJyIGFzIEVycm9yKTtcclxuICAgICAgdGhyb3cgZXJyO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIC8vIFNpZ24gaW4gd2l0aCBHb29nbGVcclxuICBjb25zdCBzaWduSW5XaXRoR29vZ2xlID0gYXN5bmMgKCkgPT4ge1xyXG4gICAgdHJ5IHtcclxuICAgICAgc2V0RXJyb3IobnVsbCk7XHJcbiAgICAgIGNvbnN0IHByb3ZpZGVyID0gbmV3IEdvb2dsZUF1dGhQcm92aWRlcigpO1xyXG4gICAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBzaWduSW5XaXRoUG9wdXAoZmlyZWJhc2VBdXRoLCBwcm92aWRlcik7XHJcbiAgICAgIHNldFVzZXIocmVzdWx0LnVzZXIpO1xyXG4gICAgfSBjYXRjaCAoZXJyKSB7XHJcbiAgICAgIHNldEVycm9yKGVyciBhcyBFcnJvcik7XHJcbiAgICAgIHRocm93IGVycjtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICAvLyBTaWduIG91dFxyXG4gIGNvbnN0IGxvZ291dCA9IGFzeW5jICgpID0+IHtcclxuICAgIHRyeSB7XHJcbiAgICAgIHNldEVycm9yKG51bGwpO1xyXG4gICAgICBhd2FpdCBzaWduT3V0KGZpcmViYXNlQXV0aCk7XHJcbiAgICAgIHNldFVzZXIobnVsbCk7XHJcbiAgICB9IGNhdGNoIChlcnIpIHtcclxuICAgICAgc2V0RXJyb3IoZXJyIGFzIEVycm9yKTtcclxuICAgICAgdGhyb3cgZXJyO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IHZhbHVlID0ge1xyXG4gICAgdXNlcixcclxuICAgIGxvYWRpbmcsXHJcbiAgICBlcnJvcixcclxuICAgIHNpZ25VcCxcclxuICAgIHNpZ25JbixcclxuICAgIHNpZ25JbldpdGhHb29nbGUsXHJcbiAgICBsb2dvdXQsXHJcbiAgfTtcclxuXHJcbiAgcmV0dXJuIDxBdXRoQ29udGV4dC5Qcm92aWRlciB2YWx1ZT17dmFsdWV9PntjaGlsZHJlbn08L0F1dGhDb250ZXh0LlByb3ZpZGVyPjtcclxufVxyXG5cclxuZXhwb3J0IGZ1bmN0aW9uIHVzZUF1dGgoKSB7XHJcbiAgY29uc3QgY29udGV4dCA9IHVzZUNvbnRleHQoQXV0aENvbnRleHQpO1xyXG4gIGlmIChjb250ZXh0ID09PSB1bmRlZmluZWQpIHtcclxuICAgIHRocm93IG5ldyBFcnJvcihcInVzZUF1dGggbXVzdCBiZSB1c2VkIHdpdGhpbiBhbiBBdXRoUHJvdmlkZXJcIik7XHJcbiAgfVxyXG4gIHJldHVybiBjb250ZXh0O1xyXG59XHJcbiJdLCJuYW1lcyI6WyJmaXJlYmFzZUF1dGgiLCJjcmVhdGVVc2VyV2l0aEVtYWlsQW5kUGFzc3dvcmQiLCJHb29nbGVBdXRoUHJvdmlkZXIiLCJvbkF1dGhTdGF0ZUNoYW5nZWQiLCJzaWduSW5XaXRoRW1haWxBbmRQYXNzd29yZCIsInNpZ25JbldpdGhQb3B1cCIsInNpZ25PdXQiLCJjcmVhdGVDb250ZXh0IiwidXNlQ29udGV4dCIsInVzZUVmZmVjdCIsInVzZVN0YXRlIiwiQXV0aENvbnRleHQiLCJ1bmRlZmluZWQiLCJBdXRoUHJvdmlkZXIiLCJjaGlsZHJlbiIsInVzZXIiLCJzZXRVc2VyIiwibG9hZGluZyIsInNldExvYWRpbmciLCJlcnJvciIsInNldEVycm9yIiwidW5zdWJzY3JpYmUiLCJzaWduVXAiLCJlbWFpbCIsInBhc3N3b3JkIiwicmVzdWx0IiwiZXJyIiwic2lnbkluIiwic2lnbkluV2l0aEdvb2dsZSIsInByb3ZpZGVyIiwibG9nb3V0IiwidmFsdWUiLCJQcm92aWRlciIsInVzZUF1dGgiLCJjb250ZXh0IiwiRXJyb3IiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(ssr)/./src/features/auth/AuthContext.tsx\n");
+
+/***/ }),
+
 /***/ "(ssr)/./src/hooks/useVideoFeed.ts":
 /*!***********************************!*\
   !*** ./src/hooks/useVideoFeed.ts ***!
@@ -149,6 +325,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   useVideoFeed: () => (/* binding */ useVideoFeed)\n/* harmony export */ });\n/* harmony import */ var _lib_video_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/lib/video-data */ \"(ssr)/./src/lib/video-data.ts\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ \"(ssr)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/ssr/react.js\");\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);\n\n\nfunction useVideoFeed() {\n    const [currentIndex, setCurrentIndex] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(0);\n    const [likedVideos, setLikedVideos] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);\n    const [skippedVideos, setSkippedVideos] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);\n    const currentVideo = currentIndex < _lib_video_data__WEBPACK_IMPORTED_MODULE_0__.TEST_VIDEOS.length ? _lib_video_data__WEBPACK_IMPORTED_MODULE_0__.TEST_VIDEOS[currentIndex] : null;\n    const isLastVideo = currentIndex >= _lib_video_data__WEBPACK_IMPORTED_MODULE_0__.TEST_VIDEOS.length - 1;\n    const handleLike = ()=>{\n        if (currentVideo) {\n            setLikedVideos([\n                ...likedVideos,\n                currentVideo\n            ]);\n            setCurrentIndex(currentIndex + 1);\n        }\n    };\n    const handleSkip = ()=>{\n        if (currentVideo) {\n            setSkippedVideos([\n                ...skippedVideos,\n                currentVideo\n            ]);\n            setCurrentIndex(currentIndex + 1);\n        }\n    };\n    const resetFeed = ()=>{\n        setCurrentIndex(0);\n        setLikedVideos([]);\n        setSkippedVideos([]);\n    };\n    const stats = {\n        totalViewed: currentIndex,\n        totalLikes: likedVideos.length,\n        totalSkips: skippedVideos.length\n    };\n    return {\n        currentVideo,\n        isLastVideo,\n        likedVideos,\n        skippedVideos,\n        handleLike,\n        handleSkip,\n        resetFeed,\n        stats\n    };\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9zcmMvaG9va3MvdXNlVmlkZW9GZWVkLnRzIiwibWFwcGluZ3MiOiI7Ozs7Ozs7QUFBOEQ7QUFDN0I7QUFpQjFCLFNBQVNFO0lBQ2QsTUFBTSxDQUFDQyxjQUFjQyxnQkFBZ0IsR0FBR0gsK0NBQVFBLENBQUM7SUFDakQsTUFBTSxDQUFDSSxhQUFhQyxlQUFlLEdBQUdMLCtDQUFRQSxDQUFrQixFQUFFO0lBQ2xFLE1BQU0sQ0FBQ00sZUFBZUMsaUJBQWlCLEdBQUdQLCtDQUFRQSxDQUFrQixFQUFFO0lBRXRFLE1BQU1RLGVBQ0pOLGVBQWVILHdEQUFXQSxDQUFDVSxNQUFNLEdBQUdWLHdEQUFXLENBQUNHLGFBQWEsR0FBRztJQUNsRSxNQUFNUSxjQUFjUixnQkFBZ0JILHdEQUFXQSxDQUFDVSxNQUFNLEdBQUc7SUFFekQsTUFBTUUsYUFBYTtRQUNqQixJQUFJSCxjQUFjO1lBQ2hCSCxlQUFlO21CQUFJRDtnQkFBYUk7YUFBYTtZQUM3Q0wsZ0JBQWdCRCxlQUFlO1FBQ2pDO0lBQ0Y7SUFFQSxNQUFNVSxhQUFhO1FBQ2pCLElBQUlKLGNBQWM7WUFDaEJELGlCQUFpQjttQkFBSUQ7Z0JBQWVFO2FBQWE7WUFDakRMLGdCQUFnQkQsZUFBZTtRQUNqQztJQUNGO0lBRUEsTUFBTVcsWUFBWTtRQUNoQlYsZ0JBQWdCO1FBQ2hCRSxlQUFlLEVBQUU7UUFDakJFLGlCQUFpQixFQUFFO0lBQ3JCO0lBRUEsTUFBTU8sUUFBUTtRQUNaQyxhQUFhYjtRQUNiYyxZQUFZWixZQUFZSyxNQUFNO1FBQzlCUSxZQUFZWCxjQUFjRyxNQUFNO0lBQ2xDO0lBRUEsT0FBTztRQUNMRDtRQUNBRTtRQUNBTjtRQUNBRTtRQUNBSztRQUNBQztRQUNBQztRQUNBQztJQUNGO0FBQ0YiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9yZWVsbWVhbHMvLi9zcmMvaG9va3MvdXNlVmlkZW9GZWVkLnRzPzU0YmQiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgVEVTVF9WSURFT1MsIFZpZGVvTWV0YWRhdGEgfSBmcm9tIFwiQC9saWIvdmlkZW8tZGF0YVwiO1xyXG5pbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gXCJyZWFjdFwiO1xyXG5cclxuaW50ZXJmYWNlIFVzZVZpZGVvRmVlZFJldHVybiB7XHJcbiAgY3VycmVudFZpZGVvOiBWaWRlb01ldGFkYXRhIHwgbnVsbDtcclxuICBpc0xhc3RWaWRlbzogYm9vbGVhbjtcclxuICBsaWtlZFZpZGVvczogVmlkZW9NZXRhZGF0YVtdO1xyXG4gIHNraXBwZWRWaWRlb3M6IFZpZGVvTWV0YWRhdGFbXTtcclxuICBoYW5kbGVMaWtlOiAoKSA9PiB2b2lkO1xyXG4gIGhhbmRsZVNraXA6ICgpID0+IHZvaWQ7XHJcbiAgcmVzZXRGZWVkOiAoKSA9PiB2b2lkO1xyXG4gIHN0YXRzOiB7XHJcbiAgICB0b3RhbFZpZXdlZDogbnVtYmVyO1xyXG4gICAgdG90YWxMaWtlczogbnVtYmVyO1xyXG4gICAgdG90YWxTa2lwczogbnVtYmVyO1xyXG4gIH07XHJcbn1cclxuXHJcbmV4cG9ydCBmdW5jdGlvbiB1c2VWaWRlb0ZlZWQoKTogVXNlVmlkZW9GZWVkUmV0dXJuIHtcclxuICBjb25zdCBbY3VycmVudEluZGV4LCBzZXRDdXJyZW50SW5kZXhdID0gdXNlU3RhdGUoMCk7XHJcbiAgY29uc3QgW2xpa2VkVmlkZW9zLCBzZXRMaWtlZFZpZGVvc10gPSB1c2VTdGF0ZTxWaWRlb01ldGFkYXRhW10+KFtdKTtcclxuICBjb25zdCBbc2tpcHBlZFZpZGVvcywgc2V0U2tpcHBlZFZpZGVvc10gPSB1c2VTdGF0ZTxWaWRlb01ldGFkYXRhW10+KFtdKTtcclxuXHJcbiAgY29uc3QgY3VycmVudFZpZGVvID1cclxuICAgIGN1cnJlbnRJbmRleCA8IFRFU1RfVklERU9TLmxlbmd0aCA/IFRFU1RfVklERU9TW2N1cnJlbnRJbmRleF0gOiBudWxsO1xyXG4gIGNvbnN0IGlzTGFzdFZpZGVvID0gY3VycmVudEluZGV4ID49IFRFU1RfVklERU9TLmxlbmd0aCAtIDE7XHJcblxyXG4gIGNvbnN0IGhhbmRsZUxpa2UgPSAoKSA9PiB7XHJcbiAgICBpZiAoY3VycmVudFZpZGVvKSB7XHJcbiAgICAgIHNldExpa2VkVmlkZW9zKFsuLi5saWtlZFZpZGVvcywgY3VycmVudFZpZGVvXSk7XHJcbiAgICAgIHNldEN1cnJlbnRJbmRleChjdXJyZW50SW5kZXggKyAxKTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICBjb25zdCBoYW5kbGVTa2lwID0gKCkgPT4ge1xyXG4gICAgaWYgKGN1cnJlbnRWaWRlbykge1xyXG4gICAgICBzZXRTa2lwcGVkVmlkZW9zKFsuLi5za2lwcGVkVmlkZW9zLCBjdXJyZW50VmlkZW9dKTtcclxuICAgICAgc2V0Q3VycmVudEluZGV4KGN1cnJlbnRJbmRleCArIDEpO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IHJlc2V0RmVlZCA9ICgpID0+IHtcclxuICAgIHNldEN1cnJlbnRJbmRleCgwKTtcclxuICAgIHNldExpa2VkVmlkZW9zKFtdKTtcclxuICAgIHNldFNraXBwZWRWaWRlb3MoW10pO1xyXG4gIH07XHJcblxyXG4gIGNvbnN0IHN0YXRzID0ge1xyXG4gICAgdG90YWxWaWV3ZWQ6IGN1cnJlbnRJbmRleCxcclxuICAgIHRvdGFsTGlrZXM6IGxpa2VkVmlkZW9zLmxlbmd0aCxcclxuICAgIHRvdGFsU2tpcHM6IHNraXBwZWRWaWRlb3MubGVuZ3RoLFxyXG4gIH07XHJcblxyXG4gIHJldHVybiB7XHJcbiAgICBjdXJyZW50VmlkZW8sXHJcbiAgICBpc0xhc3RWaWRlbyxcclxuICAgIGxpa2VkVmlkZW9zLFxyXG4gICAgc2tpcHBlZFZpZGVvcyxcclxuICAgIGhhbmRsZUxpa2UsXHJcbiAgICBoYW5kbGVTa2lwLFxyXG4gICAgcmVzZXRGZWVkLFxyXG4gICAgc3RhdHMsXHJcbiAgfTtcclxufVxyXG4iXSwibmFtZXMiOlsiVEVTVF9WSURFT1MiLCJ1c2VTdGF0ZSIsInVzZVZpZGVvRmVlZCIsImN1cnJlbnRJbmRleCIsInNldEN1cnJlbnRJbmRleCIsImxpa2VkVmlkZW9zIiwic2V0TGlrZWRWaWRlb3MiLCJza2lwcGVkVmlkZW9zIiwic2V0U2tpcHBlZFZpZGVvcyIsImN1cnJlbnRWaWRlbyIsImxlbmd0aCIsImlzTGFzdFZpZGVvIiwiaGFuZGxlTGlrZSIsImhhbmRsZVNraXAiLCJyZXNldEZlZWQiLCJzdGF0cyIsInRvdGFsVmlld2VkIiwidG90YWxMaWtlcyIsInRvdGFsU2tpcHMiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(ssr)/./src/hooks/useVideoFeed.ts\n");
+
+/***/ }),
+
+/***/ "(ssr)/./src/lib/firebase/initFirebase.ts":
+/*!******************************************!*\
+  !*** ./src/lib/firebase/initFirebase.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   app: () => (/* binding */ app),\n/* harmony export */   db: () => (/* binding */ db),\n/* harmony export */   firebaseAuth: () => (/* binding */ firebaseAuth),\n/* harmony export */   firebaseStorage: () => (/* binding */ firebaseStorage),\n/* harmony export */   initFirebase: () => (/* binding */ initFirebase)\n/* harmony export */ });\n/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! firebase/app */ \"(ssr)/./node_modules/firebase/app/dist/index.mjs\");\n/* harmony import */ var firebase_auth__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! firebase/auth */ \"(ssr)/./node_modules/firebase/auth/dist/index.mjs\");\n/* harmony import */ var firebase_firestore__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! firebase/firestore */ \"(ssr)/./node_modules/firebase/firestore/dist/index.mjs\");\n/* harmony import */ var firebase_storage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! firebase/storage */ \"(ssr)/./node_modules/firebase/storage/dist/index.mjs\");\n\n\n\n\nconst firebaseConfig = {\n    apiKey: \"AIzaSyAYood9go2dG-0EPHLwBXImz_3ERMJG8l4\",\n    authDomain: \"reelmeals-63cc4.firebaseapp.com\",\n    projectId: \"reelmeals-63cc4\",\n    storageBucket: \"reelmeals-63cc4.firebasestorage.app\",\n    messagingSenderId: \"787721637459\",\n    appId: \"1:787721637459:web:034c2bc818e898cf81c0a6\"\n};\nlet firebaseApp;\nlet auth;\nlet firestore;\nlet storage;\nfunction initFirebase() {\n    if (!firebaseApp && \"undefined\" !== \"undefined\") {}\n    return {\n        app: firebaseApp,\n        auth,\n        db: firestore,\n        storage\n    };\n}\n// Export initialized instances\nconst { app, auth: firebaseAuth, db, storage: firebaseStorage } = initFirebase();\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHNzcikvLi9zcmMvbGliL2ZpcmViYXNlL2luaXRGaXJlYmFzZS50cyIsIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7QUFBbUU7QUFDQTtBQUt2QztBQUtGO0FBRTFCLE1BQU1RLGlCQUFpQjtJQUNyQkMsUUFBUUMseUNBQXdDO0lBQ2hERyxZQUFZSCxpQ0FBNEM7SUFDeERLLFdBQVdMLGlCQUEyQztJQUN0RE8sZUFBZVAscUNBQStDO0lBQzlEUyxtQkFBbUJULGNBQW9EO0lBQ3ZFVyxPQUFPWCwyQ0FBdUM7QUFDaEQ7QUFFQSxJQUFJYTtBQUNKLElBQUlDO0FBQ0osSUFBSUM7QUFDSixJQUFJQztBQUVHLFNBQVNDO0lBQ2QsSUFBSSxDQUFDSixlQUFlLGdCQUFrQixhQUFhLEVBZ0JsRDtJQUVELE9BQU87UUFBRU8sS0FBS1A7UUFBYUM7UUFBTU8sSUFBSU47UUFBV0M7SUFBUTtBQUMxRDtBQUVBLCtCQUErQjtBQUN4QixNQUFNLEVBQ1hJLEdBQUcsRUFDSE4sTUFBTVEsWUFBWSxFQUNsQkQsRUFBRSxFQUNGTCxTQUFTTyxlQUFlLEVBQ3pCLEdBQUdOLGVBQWUiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9yZWVsbWVhbHMvLi9zcmMvbGliL2ZpcmViYXNlL2luaXRGaXJlYmFzZS50cz9iOGU5Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEZpcmViYXNlQXBwLCBnZXRBcHBzLCBpbml0aWFsaXplQXBwIH0gZnJvbSBcImZpcmViYXNlL2FwcFwiO1xyXG5pbXBvcnQgeyBBdXRoLCBjb25uZWN0QXV0aEVtdWxhdG9yLCBnZXRBdXRoIH0gZnJvbSBcImZpcmViYXNlL2F1dGhcIjtcclxuaW1wb3J0IHtcclxuICBGaXJlc3RvcmUsXHJcbiAgY29ubmVjdEZpcmVzdG9yZUVtdWxhdG9yLFxyXG4gIGdldEZpcmVzdG9yZSxcclxufSBmcm9tIFwiZmlyZWJhc2UvZmlyZXN0b3JlXCI7XHJcbmltcG9ydCB7XHJcbiAgRmlyZWJhc2VTdG9yYWdlLFxyXG4gIGNvbm5lY3RTdG9yYWdlRW11bGF0b3IsXHJcbiAgZ2V0U3RvcmFnZSxcclxufSBmcm9tIFwiZmlyZWJhc2Uvc3RvcmFnZVwiO1xyXG5cclxuY29uc3QgZmlyZWJhc2VDb25maWcgPSB7XHJcbiAgYXBpS2V5OiBwcm9jZXNzLmVudi5ORVhUX1BVQkxJQ19GSVJFQkFTRV9BUElfS0VZLFxyXG4gIGF1dGhEb21haW46IHByb2Nlc3MuZW52Lk5FWFRfUFVCTElDX0ZJUkVCQVNFX0FVVEhfRE9NQUlOLFxyXG4gIHByb2plY3RJZDogcHJvY2Vzcy5lbnYuTkVYVF9QVUJMSUNfRklSRUJBU0VfUFJPSkVDVF9JRCxcclxuICBzdG9yYWdlQnVja2V0OiBwcm9jZXNzLmVudi5ORVhUX1BVQkxJQ19GSVJFQkFTRV9TVE9SQUdFX0JVQ0tFVCxcclxuICBtZXNzYWdpbmdTZW5kZXJJZDogcHJvY2Vzcy5lbnYuTkVYVF9QVUJMSUNfRklSRUJBU0VfTUVTU0FHSU5HX1NFTkRFUl9JRCxcclxuICBhcHBJZDogcHJvY2Vzcy5lbnYuTkVYVF9QVUJMSUNfRklSRUJBU0VfQVBQX0lELFxyXG59O1xyXG5cclxubGV0IGZpcmViYXNlQXBwOiBGaXJlYmFzZUFwcCB8IHVuZGVmaW5lZDtcclxubGV0IGF1dGg6IEF1dGggfCB1bmRlZmluZWQ7XHJcbmxldCBmaXJlc3RvcmU6IEZpcmVzdG9yZSB8IHVuZGVmaW5lZDtcclxubGV0IHN0b3JhZ2U6IEZpcmViYXNlU3RvcmFnZSB8IHVuZGVmaW5lZDtcclxuXHJcbmV4cG9ydCBmdW5jdGlvbiBpbml0RmlyZWJhc2UoKSB7XHJcbiAgaWYgKCFmaXJlYmFzZUFwcCAmJiB0eXBlb2Ygd2luZG93ICE9PSBcInVuZGVmaW5lZFwiKSB7XHJcbiAgICBmaXJlYmFzZUFwcCA9ICFnZXRBcHBzKCkubGVuZ3RoXHJcbiAgICAgID8gaW5pdGlhbGl6ZUFwcChmaXJlYmFzZUNvbmZpZylcclxuICAgICAgOiBnZXRBcHBzKClbMF07XHJcbiAgICBhdXRoID0gZ2V0QXV0aChmaXJlYmFzZUFwcCk7XHJcbiAgICBmaXJlc3RvcmUgPSBnZXRGaXJlc3RvcmUoZmlyZWJhc2VBcHApO1xyXG4gICAgc3RvcmFnZSA9IGdldFN0b3JhZ2UoZmlyZWJhc2VBcHApO1xyXG5cclxuICAgIC8vIENvbm5lY3QgdG8gZW11bGF0b3JzIGluIGRldmVsb3BtZW50XHJcbiAgICBpZiAocHJvY2Vzcy5lbnYuTk9ERV9FTlYgPT09IFwiZGV2ZWxvcG1lbnRcIikge1xyXG4gICAgICBjb25uZWN0QXV0aEVtdWxhdG9yKGF1dGgsIFwiaHR0cDovL2xvY2FsaG9zdDo5MDk5XCIsIHtcclxuICAgICAgICBkaXNhYmxlV2FybmluZ3M6IHRydWUsXHJcbiAgICAgIH0pO1xyXG4gICAgICBjb25uZWN0RmlyZXN0b3JlRW11bGF0b3IoZmlyZXN0b3JlLCBcImxvY2FsaG9zdFwiLCA4MDgwKTtcclxuICAgICAgY29ubmVjdFN0b3JhZ2VFbXVsYXRvcihzdG9yYWdlLCBcImxvY2FsaG9zdFwiLCA5MTk5KTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiB7IGFwcDogZmlyZWJhc2VBcHAsIGF1dGgsIGRiOiBmaXJlc3RvcmUsIHN0b3JhZ2UgfTtcclxufVxyXG5cclxuLy8gRXhwb3J0IGluaXRpYWxpemVkIGluc3RhbmNlc1xyXG5leHBvcnQgY29uc3Qge1xyXG4gIGFwcCxcclxuICBhdXRoOiBmaXJlYmFzZUF1dGgsXHJcbiAgZGIsXHJcbiAgc3RvcmFnZTogZmlyZWJhc2VTdG9yYWdlLFxyXG59ID0gaW5pdEZpcmViYXNlKCk7XHJcbiJdLCJuYW1lcyI6WyJnZXRBcHBzIiwiaW5pdGlhbGl6ZUFwcCIsImNvbm5lY3RBdXRoRW11bGF0b3IiLCJnZXRBdXRoIiwiY29ubmVjdEZpcmVzdG9yZUVtdWxhdG9yIiwiZ2V0RmlyZXN0b3JlIiwiY29ubmVjdFN0b3JhZ2VFbXVsYXRvciIsImdldFN0b3JhZ2UiLCJmaXJlYmFzZUNvbmZpZyIsImFwaUtleSIsInByb2Nlc3MiLCJlbnYiLCJORVhUX1BVQkxJQ19GSVJFQkFTRV9BUElfS0VZIiwiYXV0aERvbWFpbiIsIk5FWFRfUFVCTElDX0ZJUkVCQVNFX0FVVEhfRE9NQUlOIiwicHJvamVjdElkIiwiTkVYVF9QVUJMSUNfRklSRUJBU0VfUFJPSkVDVF9JRCIsInN0b3JhZ2VCdWNrZXQiLCJORVhUX1BVQkxJQ19GSVJFQkFTRV9TVE9SQUdFX0JVQ0tFVCIsIm1lc3NhZ2luZ1NlbmRlcklkIiwiTkVYVF9QVUJMSUNfRklSRUJBU0VfTUVTU0FHSU5HX1NFTkRFUl9JRCIsImFwcElkIiwiTkVYVF9QVUJMSUNfRklSRUJBU0VfQVBQX0lEIiwiZmlyZWJhc2VBcHAiLCJhdXRoIiwiZmlyZXN0b3JlIiwic3RvcmFnZSIsImluaXRGaXJlYmFzZSIsImxlbmd0aCIsImRpc2FibGVXYXJuaW5ncyIsImFwcCIsImRiIiwiZmlyZWJhc2VBdXRoIiwiZmlyZWJhc2VTdG9yYWdlIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(ssr)/./src/lib/firebase/initFirebase.ts\n");
 
 /***/ }),
 
@@ -181,7 +368,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ RootLayout),\n/* harmony export */   metadata: () => (/* binding */ metadata)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! next/font/google/target.css?{\"path\":\"src\\\\app\\\\layout.tsx\",\"import\":\"Inter\",\"arguments\":[{\"subsets\":[\"latin\"]}],\"variableName\":\"inter\"} */ \"(rsc)/./node_modules/next/font/google/target.css?{\\\"path\\\":\\\"src\\\\\\\\app\\\\\\\\layout.tsx\\\",\\\"import\\\":\\\"Inter\\\",\\\"arguments\\\":[{\\\"subsets\\\":[\\\"latin\\\"]}],\\\"variableName\\\":\\\"inter\\\"}\");\n/* harmony import */ var next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _styles_globals_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../styles/globals.css */ \"(rsc)/./src/styles/globals.css\");\n\n\n\nconst metadata = {\n    title: \"ReelMeals\",\n    description: \"Discover cooking videos through intuitive swipes\"\n};\nfunction RootLayout({ children }) {\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"html\", {\n        lang: \"en\",\n        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"body\", {\n            className: (next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_2___default().className),\n            children: children\n        }, void 0, false, {\n            fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\app\\\\layout.tsx\",\n            lineNumber: 19,\n            columnNumber: 7\n        }, this)\n    }, void 0, false, {\n        fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\app\\\\layout.tsx\",\n        lineNumber: 18,\n        columnNumber: 5\n    }, this);\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL2xheW91dC50c3giLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7QUFJTUE7QUFGeUI7QUFJeEIsTUFBTUMsV0FBcUI7SUFDaENDLE9BQU87SUFDUEMsYUFBYTtBQUNmLEVBQUU7QUFFYSxTQUFTQyxXQUFXLEVBQ2pDQyxRQUFRLEVBR1Q7SUFDQyxxQkFDRSw4REFBQ0M7UUFBS0MsTUFBSztrQkFDVCw0RUFBQ0M7WUFBS0MsV0FBV1QsK0pBQWU7c0JBQUdLOzs7Ozs7Ozs7OztBQUd6QyIsInNvdXJjZXMiOlsid2VicGFjazovL3JlZWxtZWFscy8uL3NyYy9hcHAvbGF5b3V0LnRzeD81N2E5Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB0eXBlIHsgTWV0YWRhdGEgfSBmcm9tICduZXh0JztcclxuaW1wb3J0IHsgSW50ZXIgfSBmcm9tICduZXh0L2ZvbnQvZ29vZ2xlJztcclxuaW1wb3J0ICcuLi9zdHlsZXMvZ2xvYmFscy5jc3MnO1xyXG5cclxuY29uc3QgaW50ZXIgPSBJbnRlcih7IHN1YnNldHM6IFsnbGF0aW4nXSB9KTtcclxuXHJcbmV4cG9ydCBjb25zdCBtZXRhZGF0YTogTWV0YWRhdGEgPSB7XHJcbiAgdGl0bGU6ICdSZWVsTWVhbHMnLFxyXG4gIGRlc2NyaXB0aW9uOiAnRGlzY292ZXIgY29va2luZyB2aWRlb3MgdGhyb3VnaCBpbnR1aXRpdmUgc3dpcGVzJyxcclxufTtcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIFJvb3RMYXlvdXQoe1xyXG4gIGNoaWxkcmVuLFxyXG59OiB7XHJcbiAgY2hpbGRyZW46IFJlYWN0LlJlYWN0Tm9kZTtcclxufSkge1xyXG4gIHJldHVybiAoXHJcbiAgICA8aHRtbCBsYW5nPVwiZW5cIj5cclxuICAgICAgPGJvZHkgY2xhc3NOYW1lPXtpbnRlci5jbGFzc05hbWV9PntjaGlsZHJlbn08L2JvZHk+XHJcbiAgICA8L2h0bWw+XHJcbiAgKTtcclxufSAiXSwibmFtZXMiOlsiaW50ZXIiLCJtZXRhZGF0YSIsInRpdGxlIiwiZGVzY3JpcHRpb24iLCJSb290TGF5b3V0IiwiY2hpbGRyZW4iLCJodG1sIiwibGFuZyIsImJvZHkiLCJjbGFzc05hbWUiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./src/app/layout.tsx\n");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ RootLayout),\n/* harmony export */   metadata: () => (/* binding */ metadata)\n/* harmony export */ });\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-dev-runtime */ \"(rsc)/./node_modules/next/dist/server/future/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js\");\n/* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! next/font/google/target.css?{\"path\":\"src\\\\app\\\\layout.tsx\",\"import\":\"Inter\",\"arguments\":[{\"subsets\":[\"latin\"]}],\"variableName\":\"inter\"} */ \"(rsc)/./node_modules/next/font/google/target.css?{\\\"path\\\":\\\"src\\\\\\\\app\\\\\\\\layout.tsx\\\",\\\"import\\\":\\\"Inter\\\",\\\"arguments\\\":[{\\\"subsets\\\":[\\\"latin\\\"]}],\\\"variableName\\\":\\\"inter\\\"}\");\n/* harmony import */ var next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var _features_auth_AuthContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/features/auth/AuthContext */ \"(rsc)/./src/features/auth/AuthContext.tsx\");\n/* harmony import */ var _styles_globals_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../styles/globals.css */ \"(rsc)/./src/styles/globals.css\");\n\n\n\n\nconst metadata = {\n    title: \"ReelMeals\",\n    description: \"Discover cooking videos through intuitive swipes\"\n};\nfunction RootLayout({ children }) {\n    return /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"html\", {\n        lang: \"en\",\n        children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(\"body\", {\n            className: (next_font_google_target_css_path_src_app_layout_tsx_import_Inter_arguments_subsets_latin_variableName_inter___WEBPACK_IMPORTED_MODULE_3___default().className),\n            children: /*#__PURE__*/ (0,react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxDEV)(_features_auth_AuthContext__WEBPACK_IMPORTED_MODULE_1__.AuthProvider, {\n                children: children\n            }, void 0, false, {\n                fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\app\\\\layout.tsx\",\n                lineNumber: 21,\n                columnNumber: 9\n            }, this)\n        }, void 0, false, {\n            fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\app\\\\layout.tsx\",\n            lineNumber: 20,\n            columnNumber: 7\n        }, this)\n    }, void 0, false, {\n        fileName: \"C:\\\\Users\\\\david\\\\gauntlet-ai\\\\projects\\\\reelmeals\\\\src\\\\app\\\\layout.tsx\",\n        lineNumber: 19,\n        columnNumber: 5\n    }, this);\n}\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9zcmMvYXBwL2xheW91dC50c3giLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7O0FBS01BO0FBTHFEO0FBRzVCO0FBSXhCLE1BQU1FLFdBQXFCO0lBQ2hDQyxPQUFPO0lBQ1BDLGFBQWE7QUFDZixFQUFFO0FBRWEsU0FBU0MsV0FBVyxFQUNqQ0MsUUFBUSxFQUdUO0lBQ0MscUJBQ0UsOERBQUNDO1FBQUtDLE1BQUs7a0JBQ1QsNEVBQUNDO1lBQUtDLFdBQVdWLCtKQUFlO3NCQUM5Qiw0RUFBQ0Msb0VBQVlBOzBCQUFFSzs7Ozs7Ozs7Ozs7Ozs7OztBQUl2QiIsInNvdXJjZXMiOlsid2VicGFjazovL3JlZWxtZWFscy8uL3NyYy9hcHAvbGF5b3V0LnRzeD81N2E5Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IEF1dGhQcm92aWRlciB9IGZyb20gXCJAL2ZlYXR1cmVzL2F1dGgvQXV0aENvbnRleHRcIjtcclxuaW1wb3J0IHR5cGUgeyBNZXRhZGF0YSB9IGZyb20gXCJuZXh0XCI7XHJcbmltcG9ydCB7IEludGVyIH0gZnJvbSBcIm5leHQvZm9udC9nb29nbGVcIjtcclxuaW1wb3J0IFwiLi4vc3R5bGVzL2dsb2JhbHMuY3NzXCI7XHJcblxyXG5jb25zdCBpbnRlciA9IEludGVyKHsgc3Vic2V0czogW1wibGF0aW5cIl0gfSk7XHJcblxyXG5leHBvcnQgY29uc3QgbWV0YWRhdGE6IE1ldGFkYXRhID0ge1xyXG4gIHRpdGxlOiBcIlJlZWxNZWFsc1wiLFxyXG4gIGRlc2NyaXB0aW9uOiBcIkRpc2NvdmVyIGNvb2tpbmcgdmlkZW9zIHRocm91Z2ggaW50dWl0aXZlIHN3aXBlc1wiLFxyXG59O1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24gUm9vdExheW91dCh7XHJcbiAgY2hpbGRyZW4sXHJcbn06IHtcclxuICBjaGlsZHJlbjogUmVhY3QuUmVhY3ROb2RlO1xyXG59KSB7XHJcbiAgcmV0dXJuIChcclxuICAgIDxodG1sIGxhbmc9XCJlblwiPlxyXG4gICAgICA8Ym9keSBjbGFzc05hbWU9e2ludGVyLmNsYXNzTmFtZX0+XHJcbiAgICAgICAgPEF1dGhQcm92aWRlcj57Y2hpbGRyZW59PC9BdXRoUHJvdmlkZXI+XHJcbiAgICAgIDwvYm9keT5cclxuICAgIDwvaHRtbD5cclxuICApO1xyXG59XHJcbiJdLCJuYW1lcyI6WyJpbnRlciIsIkF1dGhQcm92aWRlciIsIm1ldGFkYXRhIiwidGl0bGUiLCJkZXNjcmlwdGlvbiIsIlJvb3RMYXlvdXQiLCJjaGlsZHJlbiIsImh0bWwiLCJsYW5nIiwiYm9keSIsImNsYXNzTmFtZSJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(rsc)/./src/app/layout.tsx\n");
 
 /***/ }),
 
@@ -201,6 +388,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,next_dist_build_webpack_loaders_next_flight_loader_module_proxy__WEBPACK_IMPORTED_MODULE_0__.createProxy)(String.raw`C:\Users\david\gauntlet-ai\projects\reelmeals\src\app\page.tsx#default`));
 
 
+/***/ }),
+
+/***/ "(rsc)/./src/features/auth/AuthContext.tsx":
+/*!*******************************************!*\
+  !*** ./src/features/auth/AuthContext.tsx ***!
+  \*******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AuthProvider: () => (/* binding */ e0),
+/* harmony export */   useAuth: () => (/* binding */ e1)
+/* harmony export */ });
+/* harmony import */ var next_dist_build_webpack_loaders_next_flight_loader_module_proxy__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! next/dist/build/webpack/loaders/next-flight-loader/module-proxy */ "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-loader/module-proxy.js");
+
+
+const e0 = (0,next_dist_build_webpack_loaders_next_flight_loader_module_proxy__WEBPACK_IMPORTED_MODULE_0__.createProxy)(String.raw`C:\Users\david\gauntlet-ai\projects\reelmeals\src\features\auth\AuthContext.tsx#AuthProvider`);
+
+const e1 = (0,next_dist_build_webpack_loaders_next_flight_loader_module_proxy__WEBPACK_IMPORTED_MODULE_0__.createProxy)(String.raw`C:\Users\david\gauntlet-ai\projects\reelmeals\src\features\auth\AuthContext.tsx#useAuth`);
+
+
 /***/ })
 
 };
@@ -210,7 +419,7 @@ __webpack_require__.r(__webpack_exports__);
 var __webpack_require__ = require("../webpack-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/@swc"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=export&preferredRegion=&middlewareConfig=e30%3D!")));
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/@grpc","vendor-chunks/protobufjs","vendor-chunks/@protobufjs","vendor-chunks/@firebase","vendor-chunks/@swc","vendor-chunks/firebase","vendor-chunks/idb","vendor-chunks/tslib","vendor-chunks/long","vendor-chunks/lodash.camelcase"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fpage&page=%2Fpage&appPaths=%2Fpage&pagePath=private-next-app-dir%2Fpage.tsx&appDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals%5Csrc%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5Cdavid%5Cgauntlet-ai%5Cprojects%5Creelmeals&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=export&preferredRegion=&middlewareConfig=e30%3D!")));
 module.exports = __webpack_exports__;
 
 })();
