@@ -1,5 +1,15 @@
 "use client";
 
+import { firebaseStorage } from "@/lib/firebase/initFirebase";
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+  PauseIcon,
+  PlayIcon,
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+} from "@heroicons/react/24/solid";
+import { getDownloadURL, ref } from "firebase/storage";
 import { useEffect, useRef, useState } from "react";
 
 interface VideoPlayerProps {
@@ -12,6 +22,9 @@ interface VideoPlayerProps {
   onPause?: () => void;
   onEnded?: () => void;
 }
+
+// Add this at the top of the file, outside the component
+let globalMuted = true;
 
 export default function VideoPlayer({
   videoUrl,
@@ -28,10 +41,43 @@ export default function VideoPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(muted);
+  const [isMuted, setIsMuted] = useState(globalMuted);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+
+  // Convert gs:// URL to download URL
+  useEffect(() => {
+    async function getVideoUrl() {
+      try {
+        if (!firebaseStorage) {
+          throw new Error("Firebase Storage not initialized");
+        }
+
+        if (videoUrl.startsWith("gs://")) {
+          // Extract just the filename from the gs:// URL
+          const filename = videoUrl.split("/").pop();
+          if (!filename) {
+            throw new Error("Invalid video URL format");
+          }
+
+          // Create reference directly to the file
+          const gsRef = ref(firebaseStorage, filename);
+          const url = await getDownloadURL(gsRef);
+          console.log("Generated download URL:", url);
+          setDownloadUrl(url);
+        } else {
+          setDownloadUrl(videoUrl);
+        }
+      } catch (error) {
+        console.error("Error getting video URL:", error);
+        onError?.(error);
+      }
+    }
+
+    getVideoUrl();
+  }, [videoUrl, onError]);
 
   // Handle video metadata loaded
   const handleLoadedMetadata = () => {
@@ -71,22 +117,42 @@ export default function VideoPlayer({
     }
   };
 
-  // Handle volume change
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    if (videoRef.current) {
-      videoRef.current.volume = newVolume;
-      setVolume(newVolume);
-      setIsMuted(newVolume === 0);
-    }
+  // Handle progress bar interactions
+  const handleProgressMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsScrubbing(true);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (progressRef.current && videoRef.current) {
+        const rect = progressRef.current.getBoundingClientRect();
+        const pos = Math.max(
+          0,
+          Math.min(1, (e.clientX - rect.left) / rect.width)
+        );
+        videoRef.current.currentTime = pos * duration;
+        setCurrentTime(pos * duration);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsScrubbing(false);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    // Initial position update
+    handleMouseMove(e.nativeEvent);
   };
 
-  // Toggle mute
+  // Toggle mute with persistence
   const toggleMute = () => {
     if (videoRef.current) {
       const newMutedState = !isMuted;
       videoRef.current.muted = newMutedState;
       setIsMuted(newMutedState);
+      globalMuted = newMutedState;
     }
   };
 
@@ -133,111 +199,120 @@ export default function VideoPlayer({
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [isPlaying]);
 
-  // Initial setup
+  // Initial setup with mute persistence
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    video.load();
-    if (autoPlay) {
-      video.play().catch((error) => {
-        console.error("Failed to autoplay:", error);
+    // Set initial mute state from global state
+    video.muted = globalMuted;
+
+    const attemptPlay = async () => {
+      try {
+        if (autoPlay) {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.log("Autoplay prevented:", error);
+              setIsPlaying(false);
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Video playback error:", error);
         onError?.(error);
-      });
-    }
+      }
+    };
+
+    video.addEventListener("loadeddata", attemptPlay);
 
     return () => {
+      video.removeEventListener("loadeddata", attemptPlay);
       video.pause();
     };
-  }, [videoUrl, autoPlay, onError]);
+  }, [downloadUrl, autoPlay, onError]);
 
   return (
     <div
       className="relative w-full aspect-[9/16] bg-black group"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
+      data-scrubbing={isScrubbing}
     >
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-contain cursor-pointer"
-        src={videoUrl}
-        playsInline
-        loop={loop}
-        muted={isMuted}
-        onClick={togglePlay}
-        onLoadedMetadata={handleLoadedMetadata}
-        onTimeUpdate={handleTimeUpdate}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={onEnded}
-        onError={(e) => onError?.(e)}
-      />
+      {downloadUrl && (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-contain cursor-pointer"
+          src={downloadUrl}
+          playsInline
+          loop={loop}
+          muted={isMuted}
+          autoPlay={autoPlay}
+          onClick={togglePlay}
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={onEnded}
+          onError={(e) => onError?.(e)}
+        />
+      )}
 
       {/* Video Controls */}
-      <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {/* Progress Bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-30">
+        {/* Progress bar */}
         <div
           ref={progressRef}
-          className="w-full h-1 bg-gray-600 cursor-pointer mb-4 rounded-full overflow-hidden"
-          onClick={handleProgressClick}
+          className="relative h-1.5 w-full bg-white/30 cursor-pointer"
+          onMouseDown={handleProgressMouseDown}
+          onTouchStart={handleProgressMouseDown}
         >
           <div
-            className="h-full bg-primary-500 relative"
+            className="absolute h-full bg-white shadow-md"
             style={{ width: `${(currentTime / duration) * 100}%` }}
-          >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full transform -translate-x-1/2" />
-          </div>
+          />
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            {/* Play/Pause Button */}
+        {/* Controls */}
+        <div className="flex items-center justify-between px-4 py-2 bg-black/50 backdrop-blur-sm">
+          <div className="flex items-center space-x-3">
             <button
               onClick={togglePlay}
-              className="text-white hover:text-primary-400 p-2"
+              className="text-white hover:text-gray-200 p-1.5"
             >
-              {isPlaying ? "⏸" : "▶️"}
+              {isPlaying ? (
+                <PauseIcon className="w-6 h-6" />
+              ) : (
+                <PlayIcon className="w-6 h-6" />
+              )}
             </button>
 
-            {/* Volume Control */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={toggleMute}
-                className="text-white hover:text-primary-400 p-2"
-              >
-                {isMuted ? "🔇" : "🔊"}
-              </button>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                className="w-20"
-              />
-            </div>
+            <button
+              onClick={toggleMute}
+              className="text-white hover:text-gray-200 p-1.5"
+            >
+              {isMuted ? (
+                <SpeakerXMarkIcon className="w-6 h-6" />
+              ) : (
+                <SpeakerWaveIcon className="w-6 h-6" />
+              )}
+            </button>
 
-            {/* Time Display */}
-            <div className="text-white text-sm">
+            <div className="text-white font-medium">
               {formatTime(currentTime)} / {formatTime(duration)}
             </div>
           </div>
 
-          {/* Right Controls */}
-          <div className="flex items-center space-x-4">
-            {/* Fullscreen Button */}
-            <button
-              onClick={toggleFullscreen}
-              className="text-white hover:text-primary-400 p-2"
-            >
-              {isFullscreen ? "⤓" : "⤢"}
-            </button>
-          </div>
+          <button
+            onClick={toggleFullscreen}
+            className="text-white hover:text-gray-200 p-1.5"
+          >
+            {isFullscreen ? (
+              <ArrowsPointingInIcon className="w-6 h-6" />
+            ) : (
+              <ArrowsPointingOutIcon className="w-6 h-6" />
+            )}
+          </button>
         </div>
       </div>
     </div>

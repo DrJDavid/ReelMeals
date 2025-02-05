@@ -13,26 +13,17 @@ service cloud.firestore {
 
     // Videos collection
     match /videos/{videoId} {
-      allow read: if true;  // Public read access for discovery
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && 
-        isOwner(resource.data.uploadedByUserId);
+      allow read, write: if true;  // Allow all operations during development
     }
     
     // Collections (saved recipes, etc.)
     match /collections/{collectionId} {
-      allow read: if isAuthenticated() && 
-        isOwner(resource.data.userId);
-      allow create: if isAuthenticated() && 
-        isOwner(request.resource.data.userId);
-      allow update, delete: if isAuthenticated() && 
-        isOwner(resource.data.userId);
+      allow read, write: if true;  // Allow all operations during development
     }
     
     // User profiles
     match /users/{userId} {
-      allow read: if true;  // Public profiles
-      allow create, update, delete: if isOwner(userId);
+      allow read, write: if true;  // Allow all operations during development
     }
   }
 } 

@@ -1,84 +1,94 @@
 "use client";
 
-import SwipeableView from "@/components/swipe/SwipeableView";
-import SwipeCard from "@/components/swipe/SwipeCard";
-import { useVideoFeed } from "@/hooks/useVideoFeed";
+import { useAuth } from "@/features/auth/AuthContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
-  const {
-    currentVideo,
-    isLastVideo,
-    handleLike,
-    handleSkip,
-    resetFeed,
-    stats,
-  } = useVideoFeed();
+export default function LandingPage() {
+  const { user } = useAuth();
+  const router = useRouter();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-900">
-      <div className="w-full max-w-md">
-        {!isLastVideo && currentVideo ? (
-          <>
-            <SwipeableView onSwipeLeft={handleSkip} onSwipeRight={handleLike}>
-              <SwipeCard
-                video={currentVideo}
-                onError={(error) => console.error("Video error:", error)}
-              />
-            </SwipeableView>
+    <main className="min-h-screen bg-gray-900 text-white">
+      {/* Hero Section */}
+      <div className="relative h-screen">
+        {/* Video Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          <video
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+            autoPlay
+            muted
+            loop
+            playsInline
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-60" />
+        </div>
 
-            {/* Swipe Instructions */}
-            <div className="mt-6 flex justify-between text-gray-400 text-sm px-4">
-              <div className="flex flex-col items-center">
-                <span className="text-red-500 text-lg mb-1">←</span>
-                <span>Swipe left to skip</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-green-500 text-lg mb-1">→</span>
-                <span>Swipe right to like</span>
-              </div>
-            </div>
+        {/* Content */}
+        <div className="relative h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-6xl font-bold mb-6">
+              Welcome to ReelMeals
+            </h1>
+            <p className="text-xl sm:text-2xl mb-12 max-w-2xl mx-auto">
+              Discover amazing cooking videos with just a swipe. Learn, cook,
+              and share your culinary journey.
+            </p>
 
-            {/* Debug Buttons */}
-            <div className="mt-4 flex justify-center gap-4">
-              <button
-                onClick={handleSkip}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            <div className="space-y-4 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row justify-center">
+              {user ? (
+                // Logged in user
+                <Link
+                  href="/feed"
+                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-gray-100 md:text-lg"
+                >
+                  Go to Feed
+                </Link>
+              ) : (
+                // Not logged in
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-gray-100 md:text-lg"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-black md:text-lg"
+                  >
+                    Create Account
+                  </Link>
+                </>
+              )}
+              <Link
+                href="/feed?mode=guest"
+                className="inline-flex items-center justify-center px-8 py-3 border border-gray-400 text-base font-medium rounded-md text-gray-300 bg-transparent hover:border-white hover:text-white md:text-lg"
               >
-                Skip (←)
-              </button>
-              <button
-                onClick={handleLike}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Like (→)
-              </button>
+                Try as Guest
+              </Link>
             </div>
+          </div>
 
-            {/* Stats */}
-            <div className="mt-6 text-center text-gray-400">
+          {/* Features Grid */}
+          <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Discover</h3>
               <p>
-                Viewed: {stats.totalViewed} • Liked: {stats.totalLikes} •
-                Skipped: {stats.totalSkips}
+                Find new recipes and cooking techniques with intuitive swipes
               </p>
             </div>
-          </>
-        ) : (
-          <div className="text-center text-white p-8 bg-gray-800 rounded-xl">
-            <h2 className="text-2xl font-bold mb-4">No More Videos!</h2>
-            <p className="mb-4">You've seen all available videos.</p>
-            <div className="space-y-2">
-              <p>Total Viewed: {stats.totalViewed}</p>
-              <p>Liked: {stats.totalLikes} videos</p>
-              <p>Skipped: {stats.totalSkips} videos</p>
+            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Learn</h3>
+              <p>Watch step-by-step video guides from expert chefs</p>
             </div>
-            <button
-              onClick={resetFeed}
-              className="mt-4 px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
-            >
-              Start Over
-            </button>
+            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
+              <h3 className="text-xl font-semibold mb-2">Save</h3>
+              <p>Create collections of your favorite recipes</p>
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </main>
   );

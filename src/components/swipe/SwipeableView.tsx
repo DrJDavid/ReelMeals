@@ -27,6 +27,15 @@ export default function SwipeableView({
   const minSwipeDistance = 100;
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    // Don't start swipe if we're scrubbing the video
+    const target = e.target as HTMLElement;
+    const videoPlayer = target.closest('[data-scrubbing="true"]');
+    if (videoPlayer) return;
+
+    // Also check if the click/touch is on the video controls
+    const controls = target.closest(".video-controls");
+    if (controls) return;
+
     if (isExiting) return;
     setIsDragging(true);
     const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
@@ -36,6 +45,14 @@ export default function SwipeableView({
 
   const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isDragging || isExiting) return;
+
+    // Don't swipe if we're scrubbing
+    const target = e.target as HTMLElement;
+    const videoPlayer = target.closest('[data-scrubbing="true"]');
+    if (videoPlayer) {
+      handleTouchEnd();
+      return;
+    }
 
     const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
     setTouchEnd(clientX);

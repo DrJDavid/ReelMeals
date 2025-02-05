@@ -1,3 +1,5 @@
+"use client";
+
 import { FirebaseApp, getApps, initializeApp } from "firebase/app";
 import { Auth, connectAuthEmulator, getAuth } from "firebase/auth";
 import {
@@ -25,6 +27,9 @@ let auth: Auth | undefined;
 let firestore: Firestore | undefined;
 let storage: FirebaseStorage | undefined;
 
+// Check if we should use emulators
+const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true";
+
 export function initFirebase() {
   if (!firebaseApp && typeof window !== "undefined") {
     firebaseApp = !getApps().length
@@ -34,13 +39,15 @@ export function initFirebase() {
     firestore = getFirestore(firebaseApp);
     storage = getStorage(firebaseApp);
 
-    // Connect to emulators in development
-    if (process.env.NODE_ENV === "development") {
-      connectAuthEmulator(auth, "http://localhost:9099", {
-        disableWarnings: true,
-      });
-      connectFirestoreEmulator(firestore, "localhost", 8080);
-      connectStorageEmulator(storage, "localhost", 9199);
+    // Connect to emulators only if explicitly enabled
+    if (useEmulator) {
+      console.log("Using Firebase Emulators");
+      if (auth)
+        connectAuthEmulator(auth, "http://localhost:9098", {
+          disableWarnings: true,
+        });
+      if (firestore) connectFirestoreEmulator(firestore, "localhost", 8081);
+      if (storage) connectStorageEmulator(storage, "localhost", 9198);
     }
   }
 
