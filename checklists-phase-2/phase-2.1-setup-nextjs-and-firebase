@@ -1,0 +1,27 @@
+Verify Firebase Project Initialization in src/config/firebase.ts:
+
+Confirm that you've initialized Firebase in src/config/firebase.ts using initializeApp(firebaseConfig).
+
+Ensure you are exporting app, db (Firestore), auth (Auth), and storage (Storage) from this file.
+
+Double-check the singleton pattern implementation for Firebase initialization in Next.js (if applicable, based on your current setup).
+
+Create lib/firebase/initFirebase.ts (if not already created): If you haven't already, create a file src/lib/firebase/initFirebase.ts to house your Firebase initialization logic. (This is a good practice for organization).
+
+Move Firebase Initialization Code to initFirebase.ts: Move the Firebase initialization code (from src/config/firebase.ts or wherever you have it) into src/lib/firebase/initFirebase.ts.
+
+Update Exports in initFirebase.ts: Ensure src/lib/firebase/initFirebase.ts exports db, auth, and storage (and app if needed).
+
+Update Imports in Components/Pages: Update any components or pages that were previously importing Firebase services from src/config/firebase.ts to now import them from src/lib/firebase/initFirebase.ts.
+
+Test Firebase Connection in app/page.tsx (Basic Test):
+
+In your src/app/page.tsx, add a basic Firebase Firestore read operation just to test the connection. For example, try fetching a dummy document (you might need to create a dummy collection/document in your Firestore emulator UI first).
+
+Display the fetched data (even if it's just in console.log or a simple text on the page) to confirm the connection.
+
+(Example: const testDoc = await getDoc(doc(db, "testCollection", "testDocId")); console.log(testDoc.data());)
+
+Run npm run dev:emulator: Start your development server with emulators again.
+
+Verify Firebase Connection (No Errors): Check your browser console and terminal for any Firebase connection errors. If your test in app/page.tsx works (data is logged or displayed), then your Next.js project is successfully connected to Firebase (emulators)!

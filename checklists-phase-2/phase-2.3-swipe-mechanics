@@ -1,0 +1,31 @@
+Create src/components/swipe/SwipeableView.tsx: Create a component to handle swipe gestures: src/components/swipe/SwipeableView.tsx.
+
+Basic SwipeableView Structure: In SwipeableView.tsx, create a functional component that:
+
+Accepts onSwipeLeft and onSwipeRight props (functions).
+
+Wraps its children in a <div>.
+
+For now, just add simple onClick handlers to the <div> that call onSwipeLeft() and onSwipeRight() (for testing purposes - we'll implement actual swipe gestures later). You can use buttons inside the SwipeableView for now to trigger these "swipes".
+
+Create src/components/swipe/SwipeCard.tsx: Create a placeholder SwipeCard component: src/components/swipe/SwipeCard.tsx.
+
+Basic SwipeCard Structure: In SwipeCard.tsx, create a functional component that:
+
+Accepts a videoUrl prop.
+
+Renders your VideoPlayer component, passing the videoUrl prop.
+
+For now, just display the VideoPlayer - don't worry about swipe animations or metadata yet.
+
+Import and Render SwipeableView and SwipeCard in app/page.tsx:
+
+Import SwipeableView and SwipeCard into app/page.tsx.
+
+Replace the direct VideoPlayer render in app/page.tsx with a SwipeableView component.
+
+Inside SwipeableView, render a SwipeCard component, passing your test video URL as the videoUrl prop.
+
+Implement simple placeholder functions for onSwipeLeft and onSwipeRight props on SwipeableView (e.g., console.log("Swiped Left")).
+
+Test Basic "Swipe" Actions (Click Handlers): Run npm run dev:emulator. You should see your video player within the SwipeableView. Clicking the placeholder "swipe buttons" (or whatever UI elements you used for testing) should log "Swiped Left" or "Swiped Right" to the console.

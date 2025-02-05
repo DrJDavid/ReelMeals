@@ -1,0 +1,25 @@
+Create src/lib/video-data.ts (or similar): Create a file to hold your video data (for now, static data): src/lib/video-data.ts.
+
+Define VideoCard Interface (or Type): In src/lib/video-data.ts, define a TypeScript interface or type for your VideoCard data structure. Include fields like id, videoUrl, title, cuisine, cookingTime, difficulty, thumbnailUrl. (Refer to your PRD v3.0 data model for VideoCard).
+
+Create Sample Video Data (Static Array): In src/lib/video-data.ts, create a static array of VideoCard objects. Include a few sample videos with URLs and placeholder metadata.
+
+Create src/hooks/useVideoFeed.ts (or similar): Create a custom hook to manage your video feed: src/hooks/useVideoFeed.ts.
+
+Basic useVideoFeed Hook: In useVideoFeed.ts, create a hook that:
+
+Imports your static video data array from src/lib/video-data.ts.
+
+Returns this static video data array (for now, just directly return the array).
+
+Update app/page.tsx to Use useVideoFeed and Render Multiple SwipeCards:
+
+Import your useVideoFeed hook into app/page.tsx.
+
+Call useVideoFeed() in app/page.tsx to get the video data.
+
+Map over the video data array and render a SwipeCard component for each video in the array. Pass the videoUrl (and any other relevant data) from each video object as props to SwipeCard.
+
+For now, you can just render a vertical list of SwipeCards inside your SwipeableView (we'll handle the swipeable stack later).
+
+Test Video Feed Display (Static Data): Run npm run dev:emulator. You should now see a list of SwipeCard components, each playing a different video from your static data array.

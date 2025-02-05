@@ -1,0 +1,21 @@
+Create src/components/video/VideoPlayer.tsx: Create a new React component file for your basic video player: src/components/video/VideoPlayer.tsx.
+
+Basic Video Player Structure: In VideoPlayer.tsx, create a functional component that includes:
+
+A <video> HTML element.
+
+Props for videoUrl (string).
+
+Set the src attribute of the <video> element to the videoUrl prop.
+
+Add basic video attributes: controls, loop, muted, playsInline, autoPlay.
+
+Import and Render VideoPlayer in app/page.tsx:
+
+Import your VideoPlayer component into src/app/page.tsx.
+
+Render the VideoPlayer component on your app/page.tsx.
+
+Pass a test video URL as the videoUrl prop. You can use a publicly available video URL or upload a small test video to your Firebase Storage Emulator via the Emulator UI and use its Storage URL.
+
+Test Basic Video Playback: Run npm run dev:emulator and navigate to http://localhost:3000. You should see your video player and it should be able to play the test video using the browser's default controls.
