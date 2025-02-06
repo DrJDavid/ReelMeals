@@ -1,0 +1,41 @@
+# Phase 4.3: Performance Optimization (PWA Focus - Initial)
+
+## Lighthouse Performance Audit
+
+- [ ] Run Lighthouse "Performance" audit
+  - Use Chrome DevTools on deployed PWA
+  - Compare and improve score from previous audits
+  - Document key metrics and areas for improvement
+
+## Image Optimization
+
+- [ ] Next.js Image Component Implementation
+  - Verify usage of Next.js <Image> component for all images
+  - Check implementation for video thumbnails
+  - Ensure proper lazy loading behavior
+
+- [ ] Image Configuration
+  - Configure sizes prop for responsive images
+  - Set priority prop for critical images (e.g., first video thumbnail)
+  - Verify proper image formats and compression
+
+## Code Splitting & Lazy Loading
+
+- [ ] Bundle Size Analysis
+  - Review Next.js automatic code splitting
+  - Use Next.js DevTools or Webpack Bundle Analyzer
+  - Identify and optimize large bundles
+  - Document any bundle size concerns
+
+## Video Optimization
+
+- [ ] Video Encoding Standards
+  - Verify test videos use MP4 format
+  - Check H.264 codec implementation
+  - Ensure reasonable bitrate/resolution
+  - Test video loading performance on mobile networks
+
+- [ ] Firebase Storage Configuration
+  - Review video upload settings
+  - Verify proper caching headers
+  - Test video delivery performance 

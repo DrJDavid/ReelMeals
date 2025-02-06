@@ -1,0 +1,44 @@
+# Phase 4.1: PWA Installability & "Browser Element" Removal
+
+## Review manifest.json (in public/)
+
+- [ ] display property set to "standalone" or "fullscreen"
+  - Ensure manifest.json has "display": "standalone" (or "display": "fullscreen") to remove browser UI elements when installed
+
+- [ ] start_url is correctly set
+  - Verify start_url is set to the root path ("/") or desired starting page
+
+- [ ] icons array is properly configured
+  - Include icons of various sizes (at least 192x192 and 512x512 for Android)
+  - Include appropriate sizes for iOS
+  - Include "purpose": "maskable" in at least one icon definition for Android adaptive icons
+
+- [ ] name and short_name are set
+  - App name and short name are defined appropriately
+
+- [ ] background_color and theme_color are set
+  - Customize these to match app branding
+
+- [ ] Validate manifest.json
+  - Use an online Manifest validator to check for any errors
+
+## Test PWA Installation
+
+### Android Testing
+- [ ] Test "Add to Home screen" functionality
+  - Install PWA on Android device using Chrome's "Add to Home screen" option
+  - Verify app icon looks correct on home screen
+  - Verify app opens in standalone mode (no browser address bar, minimal browser UI)
+
+### iOS Testing
+- [ ] Test "Add to Home screen" functionality in Safari
+  - Install PWA using Safari's "Add to Home Screen" (Share Sheet -> Add to Home Screen)
+  - Verify app icon looks correct on home screen
+  - Verify app opens in standalone mode (no browser UI)
+
+## Service Worker Scope Check
+
+- [ ] Verify service worker scope is set to root (/)
+  - Check service worker registration code (managed by next-pwa)
+  - Ensure scope is set to '/' for complete app control
+  - Verify offline functionality and PWA behavior 
