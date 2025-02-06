@@ -21,12 +21,12 @@ import {
 import { useEffect, useState } from "react";
 
 type SortOption = "date" | "cookingTime" | "difficulty";
-type FilterOption = {
-  cuisine?: string;
-  difficulty?: "easy" | "medium" | "hard";
-  maxTime?: number;
-  search?: string;
-};
+interface Filters {
+  cuisine: string | null;
+  difficulty: "Easy" | "Medium" | "Hard" | null;
+  maxTime: number | null;
+  search: string | null;
+}
 
 export default function CollectionsPage() {
   const { user } = useAuth();
@@ -36,7 +36,12 @@ export default function CollectionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("date");
-  const [filters, setFilters] = useState<FilterOption>({});
+  const [filters, setFilters] = useState<Filters>({
+    cuisine: null,
+    difficulty: null,
+    maxTime: null,
+    search: null,
+  });
   const [showFilters, setShowFilters] = useState(false);
   const [removingVideo, setRemovingVideo] = useState<string | null>(null);
 
@@ -124,10 +129,10 @@ export default function CollectionsPage() {
         case "cookingTime":
           return a.cookingTime - b.cookingTime;
         case "difficulty": {
-          const difficultyOrder = { easy: 0, medium: 1, hard: 2 };
+          const difficultyOrder = { Easy: 0, Medium: 1, Hard: 2 };
           return (
-            difficultyOrder[a.difficulty as keyof typeof difficultyOrder] -
-            difficultyOrder[b.difficulty as keyof typeof difficultyOrder]
+            difficultyOrder[a.difficulty] -
+            difficultyOrder[b.difficulty]
           );
         }
         default:
@@ -150,7 +155,7 @@ export default function CollectionsPage() {
       setCollections((prevCollections) =>
         prevCollections.map((collection) => ({
           ...collection,
-          videoIds: collection.videoIds.filter((id) => id !== videoId),
+          videoIds: collection.videoIds.filter((id: string) => id !== videoId),
         }))
       );
     } catch (err) {
@@ -215,7 +220,7 @@ export default function CollectionsPage() {
                     onChange={(e) =>
                       setFilters({
                         ...filters,
-                        cuisine: e.target.value || undefined,
+                        cuisine: e.target.value || null,
                       })
                     }
                     className="w-full bg-gray-700 rounded-lg px-4 py-2 appearance-none"
@@ -240,19 +245,19 @@ export default function CollectionsPage() {
                     onChange={(e) =>
                       setFilters({
                         ...filters,
-                        difficulty: (e.target.value || undefined) as
-                          | "easy"
-                          | "medium"
-                          | "hard"
-                          | undefined,
+                        difficulty: (e.target.value || null) as
+                          | "Easy"
+                          | "Medium"
+                          | "Hard"
+                          | null,
                       })
                     }
                     className="w-full bg-gray-700 rounded-lg px-4 py-2 appearance-none"
                   >
                     <option value="">All Difficulties</option>
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
                   </select>
                   <ChevronDownIcon className="absolute right-3 top-9 w-5 h-5 pointer-events-none" />
                 </div>
@@ -268,9 +273,7 @@ export default function CollectionsPage() {
                     onChange={(e) =>
                       setFilters({
                         ...filters,
-                        maxTime: e.target.value
-                          ? Number(e.target.value)
-                          : undefined,
+                        maxTime: e.target.value ? Number(e.target.value) : null,
                       })
                     }
                     className="w-full bg-gray-700 rounded-lg px-4 py-2"
@@ -282,7 +285,14 @@ export default function CollectionsPage() {
 
               {/* Clear Filters */}
               <button
-                onClick={() => setFilters({})}
+                onClick={() =>
+                  setFilters({
+                    cuisine: null,
+                    difficulty: null,
+                    maxTime: null,
+                    search: null,
+                  })
+                }
                 className="text-sm text-gray-400 hover:text-white"
               >
                 Clear Filters

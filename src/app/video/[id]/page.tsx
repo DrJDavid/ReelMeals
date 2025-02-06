@@ -1,16 +1,9 @@
 import { VideoPageContent } from "@/components/video/VideoPageContent";
-import { getVideos } from "@/lib/firebase/firestore-service";
 
-export async function generateStaticParams() {
-  try {
-    const videos = await getVideos();
-    return videos.map((video) => ({
-      id: video.id,
-    }));
-  } catch (error) {
-    console.error("Error generating static params:", error);
-    return [];
-  }
+// This is just to satisfy Next.js static export requirement
+// The actual video data will be loaded client-side
+export function generateStaticParams() {
+  return [{ id: "placeholder" }];
 }
 
 export default function VideoPage() {

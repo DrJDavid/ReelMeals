@@ -30,7 +30,7 @@ let storage: FirebaseStorage | undefined;
 // Check if we should use emulators
 const useEmulator = process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true";
 
-export function initFirebase() {
+function initFirebase() {
   if (!firebaseApp && typeof window !== "undefined") {
     firebaseApp = !getApps().length
       ? initializeApp(firebaseConfig)
@@ -51,13 +51,16 @@ export function initFirebase() {
     }
   }
 
-  return { app: firebaseApp, auth, db: firestore, storage };
+  return { app: firebaseApp, auth, firestore, storage };
 }
 
-// Export initialized instances
-export const {
+// Initialize Firebase
+const {
   app,
   auth: firebaseAuth,
-  db,
+  firestore: db,
   storage: firebaseStorage,
 } = initFirebase();
+
+// Export initialized instances
+export { app, db, firebaseAuth, firebaseStorage };

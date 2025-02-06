@@ -13,11 +13,10 @@ interface VideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   videoUrl: string;
-  title: string;
   video: {
     title: string;
-    chef?: string;
-    difficulty: string;
+    chef: string;
+    difficulty: "Easy" | "Medium" | "Hard";
     cookingTime: number;
     description: string;
     cuisine: string;
