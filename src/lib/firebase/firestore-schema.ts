@@ -10,13 +10,40 @@ export interface FirestoreVideo {
   cookingTime: number; // in minutes
   difficulty: "Easy" | "Medium" | "Hard";
   chef: string;
-  ingredients: string[];
+  ingredients: Array<{
+    name: string;
+    amount: number;
+    unit: string;
+    estimatedPrice?: number; // Price in cents
+    notes?: string;
+  }>;
+  instructions: Array<{
+    step: number;
+    description: string;
+    timestamp?: number; // Video timestamp where this step occurs
+    duration?: number; // Estimated duration of this step
+  }>;
+  nutrition: {
+    servings: number;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    fiber: number;
+  };
   tags: string[];
   likes: number;
   views: number;
   uploadedByUserId: string;
+  aiMetadata?: {
+    detectedIngredients: string[];
+    detectedTechniques: string[];
+    confidenceScore: number;
+    lastProcessed: Timestamp;
+  };
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  status: "processing" | "active" | "failed";
 }
 
 export interface FirestoreCollection {

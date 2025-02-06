@@ -11,8 +11,8 @@ const nextConfig = {
     domains: ["firebasestorage.googleapis.com"],
     unoptimized: true, // Required for static export
   },
-  output: "export", // Changed from 'standalone' to 'export' for static generation
-  distDir: "www", // This will output to the 'www' directory that Capacitor expects
+  output: "export", // Keep as 'export' for static site generation
+  distDir: "www", // Keep the www directory for Capacitor
   // Disable server-specific features
   trailingSlash: true,
 };
