@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Allow read/write access to all documents if user is authenticated
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Keep specific collection rules for reference but make them permissive
+    match /videos/{videoId} {
+      allow read, write: if true;
+    }
+    
+    match /users/{userId}/collections/{collectionId} {
+      allow read, write: if isAuthenticated();
+    }
+    
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /collections/{collectionId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+} 

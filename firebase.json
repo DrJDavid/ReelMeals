@@ -1,0 +1,54 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": {
+    "public": "www",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/manifest.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/manifest+json"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|js|css|eot|otf|ttf|ttc|woff|woff2|font.css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ]
+  },
+  "emulators": {
+    "auth": {
+      "port": 9098
+    },
+    "firestore": {
+      "port": 8081
+    },
+    "storage": {
+      "port": 9198
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4040
+    },
+    "singleProjectMode": true
+  }
+}
