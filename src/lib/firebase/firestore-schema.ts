@@ -1,33 +1,28 @@
-import * as admin from "firebase-admin";
 import { Timestamp } from "firebase/firestore";
 
 export interface FirestoreVideo {
-  id?: string;
+  id: string;
   videoUrl: string;
+  thumbnailUrl: string;
   title: string;
   description: string;
   cuisine: string;
   cookingTime: number; // in minutes
-  difficulty: "Easy" | "Medium" | "Hard";
-  thumbnailUrl: string;
-  uploadedByUserId: string;
-  chef: string;
-  ingredients: string[];
+  difficulty: "easy" | "medium" | "hard";
   tags: string[];
-  likes: number;
-  views: number;
-  createdAt: admin.firestore.Timestamp | Timestamp;
-  updatedAt: admin.firestore.Timestamp | Timestamp;
+  uploadedByUserId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface FirestoreCollection {
-  id?: string;
+  id: string;
   userId: string;
   name: string;
   description: string;
   videoIds: string[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface FirestoreUser {

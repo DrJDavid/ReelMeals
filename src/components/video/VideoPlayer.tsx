@@ -26,7 +26,7 @@ interface VideoPlayerProps {
 // Add this at the top of the file, outside the component
 let globalMuted = true;
 
-export default function VideoPlayer({
+export function VideoPlayer({
   videoUrl,
   autoPlay = true,
   muted = true,
@@ -44,28 +44,30 @@ export default function VideoPlayer({
   const [isMuted, setIsMuted] = useState(globalMuted);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string>("");
   const [isScrubbing, setIsScrubbing] = useState(false);
 
-  // Convert gs:// URL to download URL
+  // Get video URL from Firebase Storage if needed
   useEffect(() => {
     async function getVideoUrl() {
-      try {
-        if (!firebaseStorage) {
-          throw new Error("Firebase Storage not initialized");
-        }
+      if (!videoUrl) {
+        console.error("No video URL provided");
+        onError?.(new Error("No video URL provided"));
+        return;
+      }
 
+      try {
         if (videoUrl.startsWith("gs://")) {
-          // Extract just the filename from the gs:// URL
-          const filename = videoUrl.split("/").pop();
-          if (!filename) {
-            throw new Error("Invalid video URL format");
+          // Get the full path after gs://bucket-name/
+          const fullPath = videoUrl.replace(/^gs:\/\/[^\/]+\//, "");
+          console.log("Extracted storage path:", fullPath);
+
+          if (!firebaseStorage) {
+            throw new Error("Firebase Storage not initialized");
           }
 
-          // Create reference directly to the file
-          const gsRef = ref(firebaseStorage, filename);
-          const url = await getDownloadURL(gsRef);
-          console.log("Generated download URL:", url);
+          const videoRef = ref(firebaseStorage, fullPath);
+          const url = await getDownloadURL(videoRef);
           setDownloadUrl(url);
         } else {
           setDownloadUrl(videoUrl);
@@ -239,10 +241,10 @@ export default function VideoPlayer({
       onMouseLeave={() => setShowControls(false)}
       data-scrubbing={isScrubbing}
     >
-      {downloadUrl && (
+      {downloadUrl ? (
         <video
           ref={videoRef}
-          className="absolute inset-0 w-full h-full object-contain cursor-pointer"
+          className="absolute inset-0 w-full h-full object-cover cursor-pointer"
           src={downloadUrl}
           playsInline
           loop={loop}
@@ -254,18 +256,29 @@ export default function VideoPlayer({
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           onEnded={onEnded}
-          onError={(e) => onError?.(e)}
+          onError={(e) => {
+            console.error("Video element error:", e);
+            onError?.(e);
+          }}
         />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-white">
+          Loading video...
+        </div>
       )}
 
       {/* Video Controls */}
-      <div className="absolute bottom-0 left-0 right-0 z-30">
+      <div
+        className={`absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-200 ${
+          showControls || !isPlaying ? "opacity-100" : "opacity-0"
+        }`}
+      >
         {/* Progress bar */}
         <div
           ref={progressRef}
           className="relative h-1.5 w-full bg-white/30 cursor-pointer"
+          onClick={handleProgressClick}
           onMouseDown={handleProgressMouseDown}
-          onTouchStart={handleProgressMouseDown}
         >
           <div
             className="absolute h-full bg-white shadow-md"

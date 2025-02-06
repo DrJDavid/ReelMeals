@@ -1,8 +1,8 @@
 "use client";
 
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { NavBar } from "@/components/NavBar";
 import { useAuth } from "@/features/auth/AuthContext";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
@@ -20,29 +20,9 @@ export default function ProfilePage() {
 
   return (
     <ProtectedRoute>
-      <main className="min-h-screen bg-gray-900 text-white">
-        {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 bg-gray-800 text-white py-3 px-4 z-50">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <Link href="/" className="text-xl font-bold">
-              ReelMeals
-            </Link>
-            <div className="flex items-center space-x-4">
-              <Link href="/feed" className="hover:text-gray-300">
-                Feed
-              </Link>
-              <Link href="/collections" className="hover:text-gray-300">
-                Collections
-              </Link>
-              <Link href="/profile" className="hover:text-gray-300">
-                Profile
-              </Link>
-            </div>
-          </div>
-        </nav>
-
+      <div className="min-h-screen bg-gray-900 text-white pb-20">
         {/* Profile Content */}
-        <div className="pt-24 px-4 max-w-2xl mx-auto">
+        <div className="px-4 py-8 max-w-2xl mx-auto">
           <div className="bg-gray-800 rounded-lg p-6">
             <div className="text-center mb-8">
               <div className="w-24 h-24 bg-gray-700 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -85,7 +65,9 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </main>
+
+        <NavBar />
+      </div>
     </ProtectedRoute>
   );
 }

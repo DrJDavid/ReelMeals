@@ -9,6 +9,8 @@ import {
   limit,
   orderBy,
   query,
+  serverTimestamp,
+  setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
@@ -45,6 +47,19 @@ export async function addVideo(
   const videoWithTimestamps = withTimestamps<FirestoreVideo>(video);
   const docRef = await addDoc(videosRef, videoWithTimestamps);
   return { id: docRef.id, ...videoWithTimestamps };
+}
+
+export async function getVideosByTag(tag: string) {
+  const videosRef = collection(db, "videos");
+  const q = query(
+    videosRef,
+    where("tags", "array-contains", tag),
+    orderBy("createdAt", "desc")
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as FirestoreVideo)
+  );
 }
 
 // Collection Operations
@@ -89,7 +104,7 @@ export async function addVideoToCollection(
   });
 }
 
-export async function removeVideoFromCollection(
+export async function removeVideoFromLegacyCollection(
   collectionId: string,
   videoId: string
 ) {
@@ -98,6 +113,58 @@ export async function removeVideoFromCollection(
     videoIds: arrayRemove(videoId),
     updatedAt: withUpdatedTimestamp,
   });
+}
+
+export async function saveVideoToCollection(
+  userId: string,
+  collectionName: string,
+  videoId: string
+) {
+  const collectionRef = doc(db, "users", userId, "collections", collectionName);
+  const collectionDoc = await getDoc(collectionRef);
+
+  if (!collectionDoc.exists()) {
+    // Create the collection if it doesn't exist
+    await setDoc(collectionRef, {
+      name: collectionName,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      videoIds: [videoId],
+    });
+  } else {
+    // Add video to existing collection
+    await updateDoc(collectionRef, {
+      videoIds: arrayUnion(videoId),
+      updatedAt: serverTimestamp(),
+    });
+  }
+}
+
+export async function removeVideoFromUserCollection(
+  userId: string,
+  collectionName: string,
+  videoId: string
+) {
+  const collectionRef = doc(db, "users", userId, "collections", collectionName);
+  await updateDoc(collectionRef, {
+    videoIds: arrayRemove(videoId),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function getSavedVideoIds(userId: string): Promise<string[]> {
+  const collectionsRef = collection(db, "users", userId, "collections");
+  const collectionsSnap = await getDocs(collectionsRef);
+
+  const videoIds = new Set<string>();
+  collectionsSnap.forEach((doc) => {
+    const data = doc.data();
+    if (data.videoIds) {
+      data.videoIds.forEach((id: string) => videoIds.add(id));
+    }
+  });
+
+  return Array.from(videoIds);
 }
 
 // User Operations

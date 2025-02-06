@@ -1,6 +1,6 @@
 "use client";
 
-import VideoPlayer from "@/components/video/VideoPlayer";
+import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoMetadata } from "@/lib/video-data";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";

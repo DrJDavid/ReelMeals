@@ -1,5 +1,6 @@
 "use client";
 
+import { NavBar } from "@/components/NavBar";
 import SwipeableView from "@/components/swipe/SwipeableView";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -43,33 +44,25 @@ export default function FeedPage() {
     </div>
   );
 
-  // Show navigation bar for authenticated users
-  const NavBar = () => (
-    <nav className="fixed top-0 left-0 right-0 bg-gray-800 text-white py-3 px-4 z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
-          ReelMeals
-        </Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/feed" className="hover:text-gray-300">
-            Feed
-          </Link>
-          <Link href="/collections" className="hover:text-gray-300">
-            Collections
-          </Link>
-          <Link href="/profile" className="hover:text-gray-300">
-            Profile
-          </Link>
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-900 pb-20">
+      {isGuestMode && <GuestBanner />}
+
+      {/* Logo/Title Section */}
+      <div className="fixed top-0 left-0 right-0 bg-gradient-to-b from-gray-900 to-transparent z-40 pt-4 pb-8">
+        <div className="max-w-md mx-auto px-4">
+          <div className="flex flex-col items-center">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
+              ReelMeals
+            </h1>
+            <p className="text-sm text-gray-400 mt-1">
+              Discover delicious recipes
+            </p>
+          </div>
         </div>
       </div>
-    </nav>
-  );
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-900">
-      {isGuestMode ? <GuestBanner /> : <NavBar />}
-
-      <div className="w-full max-w-md mt-16">
+      <div className="w-full max-w-md">
         {!isLastVideo && currentVideo ? (
           <>
             <SwipeableView onSwipeLeft={handleSkip} onSwipeRight={handleLike}>
@@ -90,60 +83,30 @@ export default function FeedPage() {
                 <span>Swipe right to {isGuestMode ? "skip" : "like"}</span>
               </div>
             </div>
-
-            {/* Debug Buttons */}
-            <div className="mt-4 flex justify-center gap-4">
-              <button
-                onClick={handleSkip}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Skip (←)
-              </button>
-              <button
-                onClick={handleLike}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                {isGuestMode ? "Next" : "Like"} (→)
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-6 text-center text-gray-400">
-              <p>
-                Viewed: {stats.totalViewed} •
-                {!isGuestMode && `Liked: ${stats.totalLikes} •`}
-                Skipped: {stats.totalSkips}
-              </p>
-            </div>
           </>
         ) : (
-          <div className="text-center text-white p-8 bg-gray-800 rounded-xl">
-            <h2 className="text-2xl font-bold mb-4">No More Videos!</h2>
-            <p className="mb-4">You've seen all available videos.</p>
-            <div className="space-y-2">
-              <p>Total Viewed: {stats.totalViewed}</p>
-              {!isGuestMode && <p>Liked: {stats.totalLikes} videos</p>}
-              <p>Skipped: {stats.totalSkips} videos</p>
-            </div>
-            <div className="space-y-4 mt-6">
-              <button
-                onClick={resetFeed}
-                className="w-full px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
-              >
-                Start Over
-              </button>
-              {isGuestMode && (
-                <Link
-                  href="/auth/signup"
-                  className="block w-full px-4 py-2 bg-white text-black rounded hover:bg-gray-100"
-                >
-                  Sign Up to Save Videos
-                </Link>
-              )}
-            </div>
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">No more videos!</h2>
+            <p className="text-gray-400 mb-6">
+              You've reached the end of your feed.
+            </p>
+            <button
+              onClick={resetFeed}
+              className="bg-primary-500 text-white px-6 py-3 rounded-lg hover:bg-primary-600 transition-colors"
+            >
+              Start Over
+            </button>
+            {stats && (
+              <div className="mt-8 text-gray-400">
+                <p>Videos watched: {stats.watched}</p>
+                <p>Videos liked: {stats.liked}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      <NavBar />
     </main>
   );
 }

@@ -2,7 +2,10 @@
 
 import { useAuth } from "@/features/auth/AuthContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
-import { getVideos } from "@/lib/firebase/firestore-service";
+import {
+  getVideos,
+  saveVideoToCollection,
+} from "@/lib/firebase/firestore-service";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -27,6 +30,7 @@ export function useVideoFeed(): UseVideoFeedReturn {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const isGuestMode = searchParams.get("mode") === "guest";
+  const searchQuery = searchParams.get("search");
 
   const [videos, setVideos] = useState<FirestoreVideo[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +46,22 @@ export function useVideoFeed(): UseVideoFeedReturn {
         setLoading(true);
         setError(null);
         const fetchedVideos = await getVideos(20); // Fetch 20 videos at a time
-        setVideos(fetchedVideos);
+
+        // Filter videos if there's a search query
+        if (searchQuery) {
+          const filteredVideos = fetchedVideos.filter((video) => {
+            const searchTerm = searchQuery.toLowerCase();
+            return (
+              video.title.toLowerCase().includes(searchTerm) ||
+              video.description.toLowerCase().includes(searchTerm) ||
+              video.cuisine.toLowerCase().includes(searchTerm) ||
+              video.tags.some((tag) => tag.toLowerCase().includes(searchTerm))
+            );
+          });
+          setVideos(filteredVideos);
+        } else {
+          setVideos(fetchedVideos);
+        }
       } catch (err) {
         console.error("Error fetching videos:", err);
         setError(err as Error);
@@ -52,18 +71,32 @@ export function useVideoFeed(): UseVideoFeedReturn {
     }
 
     fetchVideos();
-  }, []);
+  }, [searchQuery]);
+
+  // Reset current index when search query changes
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [searchQuery]);
 
   const currentVideo =
     currentIndex < videos.length ? videos[currentIndex] : null;
   const isLastVideo = currentIndex >= videos.length - 1;
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (currentVideo) {
       if (!isGuestMode && user) {
-        // Only store liked videos for authenticated users
-        setLikedVideos([...likedVideos, currentVideo]);
-        // TODO: Update Firestore with liked video
+        try {
+          // Save to default "Liked Videos" collection
+          await saveVideoToCollection(
+            user.uid,
+            currentVideo.id!,
+            "Liked Videos"
+          );
+          setLikedVideos([...likedVideos, currentVideo]);
+        } catch (error) {
+          console.error("Error saving video:", error);
+          // Continue with the feed even if save fails
+        }
       }
       setCurrentIndex(currentIndex + 1);
     }

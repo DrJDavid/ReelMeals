@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/features/auth/AuthContext";
+import { VideoModalProvider } from "@/features/video/VideoModalContext";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../styles/globals.css";
@@ -16,9 +17,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="en" className="h-full">
+      <body
+        className={`${inter.className} h-full bg-gray-900 text-white antialiased`}
+      >
+        <AuthProvider>
+          <VideoModalProvider>{children}</VideoModalProvider>
+        </AuthProvider>
       </body>
     </html>
   );
