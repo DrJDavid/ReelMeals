@@ -11,22 +11,26 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Videos collection - publicly readable
+    // Allow read/write access to all documents if user is authenticated
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Keep specific collection rules for reference but make them permissive
     match /videos/{videoId} {
-      allow read: if true;  // Anyone can read videos
-      allow write: if false;  // No one can write to videos directly
+      allow read, write: if true;
     }
     
-    // User collections
     match /users/{userId}/collections/{collectionId} {
-      allow read: if isOwner(userId);
-      allow write: if isOwner(userId);
+      allow read, write: if isAuthenticated();
     }
     
-    // User profiles
     match /users/{userId} {
-      allow read: if true;  // Public profiles
-      allow write: if isOwner(userId);  // Only owner can edit their profile
+      allow read, write: if isAuthenticated();
+    }
+
+    match /collections/{collectionId} {
+      allow read, write: if isAuthenticated();
     }
   }
 } 

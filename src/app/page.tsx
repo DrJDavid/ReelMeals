@@ -12,26 +12,25 @@ export default function LandingPage() {
     <main className="min-h-screen bg-gray-900 text-white">
       {/* Hero Section */}
       <div className="relative h-screen">
-        {/* Video Background */}
+        {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <video
-            className="absolute inset-0 w-full h-full object-cover opacity-50"
-            autoPlay
-            muted
-            loop
-            playsInline
-            src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-gray-900 via-primary-900/50 to-gray-900"
+            style={{
+              backgroundImage: `radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.15) 2%, transparent 0%), 
+                               radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.15) 2%, transparent 0%)`,
+              backgroundSize: "100px 100px",
+            }}
           />
-          <div className="absolute inset-0 bg-black bg-opacity-60" />
         </div>
 
         {/* Content */}
         <div className="relative h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-6xl font-bold mb-6">
+            <h1 className="text-4xl sm:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600">
               Welcome to ReelMeals
             </h1>
-            <p className="text-xl sm:text-2xl mb-12 max-w-2xl mx-auto">
+            <p className="text-xl sm:text-2xl mb-12 max-w-2xl mx-auto text-gray-300">
               Discover amazing cooking videos with just a swipe. Learn, cook,
               and share your culinary journey.
             </p>
@@ -73,19 +72,29 @@ export default function LandingPage() {
 
           {/* Features Grid */}
           <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Discover</h3>
-              <p>
+            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+              <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                Discover
+              </h3>
+              <p className="text-gray-300">
                 Find new recipes and cooking techniques with intuitive swipes
               </p>
             </div>
-            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Learn</h3>
-              <p>Watch step-by-step video guides from expert chefs</p>
+            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+              <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                Learn
+              </h3>
+              <p className="text-gray-300">
+                Watch step-by-step video guides from expert chefs
+              </p>
             </div>
-            <div className="text-center p-6 bg-gray-800 bg-opacity-75 rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Save</h3>
-              <p>Create collections of your favorite recipes</p>
+            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+              <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                Save
+              </h3>
+              <p className="text-gray-300">
+                Create collections of your favorite recipes
+              </p>
             </div>
           </div>
         </div>

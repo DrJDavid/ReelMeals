@@ -8,6 +8,7 @@ import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoModal } from "@/features/video/VideoModalContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
 import {
+  getSavedVideoIds,
   getUserCollections,
   getVideo,
   removeVideoFromUserCollection,
@@ -46,21 +47,39 @@ export default function CollectionsPage() {
 
       try {
         setLoading(true);
-        const userCollections = await getUserCollections(user.uid);
-        setCollections(userCollections);
+        setError(null);
 
-        // Fetch all videos from all collections
-        const videoIds = new Set(
-          userCollections.flatMap((collection) => collection.videoIds)
-        );
-        const videoPromises = Array.from(videoIds).map((id) => getVideo(id));
+        // Get all saved video IDs first
+        const savedVideoIds = await getSavedVideoIds(user.uid);
+
+        if (savedVideoIds.length === 0) {
+          setVideos([]);
+          setCollections([]);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch all videos that are saved
+        const videoPromises = savedVideoIds.map((id) => getVideo(id));
         const videos = (await Promise.all(videoPromises)).filter(
           (v): v is FirestoreVideo => v !== null
         );
+
         setVideos(videos);
+
+        // Get collections for organization
+        const userCollections = await getUserCollections(user.uid);
+        setCollections(userCollections);
       } catch (err) {
         console.error("Error fetching collections:", err);
-        setError(err as Error);
+        setError(
+          err instanceof Error
+            ? err
+            : new Error("Failed to load your collections. Please try again.")
+        );
+        // Clear videos and collections on error
+        setVideos([]);
+        setCollections([]);
       } finally {
         setLoading(false);
       }
@@ -123,11 +142,24 @@ export default function CollectionsPage() {
     if (!user) return;
     try {
       setRemovingVideo(videoId);
+      // Remove from all collections for now - can be made more specific later
       await removeVideoFromUserCollection(user.uid, "Liked Videos", videoId);
       // Update local state
-      setVideos(videos.filter((v) => v.id !== videoId));
+      setVideos((prevVideos) => prevVideos.filter((v) => v.id !== videoId));
+      // Also update collections state if needed
+      setCollections((prevCollections) =>
+        prevCollections.map((collection) => ({
+          ...collection,
+          videoIds: collection.videoIds.filter((id) => id !== videoId),
+        }))
+      );
     } catch (err) {
       console.error("Error removing video:", err);
+      setError(
+        err instanceof Error
+          ? err
+          : new Error("Failed to remove video. Please try again.")
+      );
     } finally {
       setRemovingVideo(null);
     }
@@ -266,15 +298,16 @@ export default function CollectionsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAndSortedVideos.map((video) => (
+              {filteredAndSortedVideos.map((video, index) => (
                 <div key={video.id} className="relative group">
                   <button
                     onClick={() => openVideo(video)}
                     className="w-full group relative aspect-[9/16] bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all duration-200"
                   >
                     <VideoThumbnail
-                      thumbnailUrl={video.thumbnailUrl}
                       title={video.title}
+                      cuisine={video.cuisine}
+                      difficulty={video.difficulty}
                       className="w-full h-full"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">

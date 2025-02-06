@@ -89,8 +89,8 @@ export function useVideoFeed(): UseVideoFeedReturn {
           // Save to default "Liked Videos" collection
           await saveVideoToCollection(
             user.uid,
-            currentVideo.id!,
-            "Liked Videos"
+            "Liked Videos",
+            currentVideo.id
           );
           setLikedVideos([...likedVideos, currentVideo]);
         } catch (error) {

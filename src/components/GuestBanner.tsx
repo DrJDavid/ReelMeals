@@ -4,23 +4,25 @@ import Link from "next/link";
 
 export function GuestBanner() {
   return (
-    <div className="fixed top-16 left-0 right-0 bg-primary-600 text-white px-4 py-3 text-center z-40">
-      <p className="text-sm">
+    <div className="bg-primary-500/10 border-b border-primary-500/20 py-2 px-4">
+      <div className="max-w-7xl mx-auto text-center text-sm">
+        <span className="text-primary-300">
+          Sign in to save videos to your collections!{" "}
+        </span>
         <Link
           href="/auth/login"
-          className="font-semibold underline hover:text-white/80"
+          className="text-primary-500 hover:text-primary-400 font-medium"
         >
-          Sign in
-        </Link>{" "}
-        or{" "}
+          Log in
+        </Link>
+        <span className="text-primary-300"> or </span>
         <Link
           href="/auth/signup"
-          className="font-semibold underline hover:text-white/80"
+          className="text-primary-500 hover:text-primary-400 font-medium"
         >
-          create an account
-        </Link>{" "}
-        to save videos and create collections
-      </p>
+          Sign up
+        </Link>
+      </div>
     </div>
   );
 }
