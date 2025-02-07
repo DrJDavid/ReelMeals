@@ -1,17 +1,19 @@
+import { incrementVideoViews } from "@/lib/firebase/firestore-operations";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
 import { formatDuration } from "@/lib/utils/format";
 import {
   ClockIcon,
   HeartIcon,
   InformationCircleIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import { useState } from "react";
 import { VideoPlayer } from "./VideoPlayer";
 
 interface VideoCardProps {
   video: FirestoreVideo;
   onLike?: () => void;
+  isInCollection?: boolean;
 }
 
 interface RecipeInfoModalProps {
@@ -132,13 +134,18 @@ function RecipeInfoModal({ video, isOpen, onClose }: RecipeInfoModalProps) {
   );
 }
 
-export function VideoCard({ video, onLike }: VideoCardProps) {
+export function VideoCard({
+  video,
+  onLike,
+  isInCollection = false,
+}: VideoCardProps) {
   const [showRecipeInfo, setShowRecipeInfo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasIncrementedView, setHasIncrementedView] = useState(false);
   const isProcessing = video.status === "processing";
   const hasFailed = video.status === "failed";
 
-  const handleLikeClick = (e: React.MouseEvent) => {
+  const handleActionClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onLike?.();
   };
@@ -148,15 +155,33 @@ export function VideoCard({ video, onLike }: VideoCardProps) {
     setShowRecipeInfo(true);
   };
 
-  const handleVideoClick = () => {
+  const handleVideoClick = async () => {
     if (!isProcessing && !hasFailed) {
       setIsPlaying(true);
+      // Only increment view count once per session
+      if (!hasIncrementedView) {
+        await incrementVideoViews(video.id);
+        setHasIncrementedView(true);
+      }
     }
   };
 
   // Handle metadata from both possible locations
   const metadata = video.aiMetadata || video.analysis?.aiMetadata;
   const suggestedHashtags = metadata?.suggestedHashtags || [];
+
+  // Generate a unique but consistent gradient for each video
+  const getGradient = (title: string) => {
+    // Use the title to generate consistent colors for the same video
+    const hue1 =
+      title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % 360;
+    const hue2 = (hue1 + 60) % 360; // Complementary color offset
+
+    return `linear-gradient(135deg, 
+      hsl(${hue1}, 70%, 30%) 0%,
+      hsl(${hue2}, 80%, 20%) 100%
+    )`;
+  };
 
   return (
     <>
@@ -209,42 +234,50 @@ export function VideoCard({ video, onLike }: VideoCardProps) {
             </div>
           ) : (
             <>
-              {/* Thumbnail */}
-              {video.thumbnailUrl ? (
-                <Image
-                  src={video.thumbnailUrl}
-                  alt={video.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
-                  <div className="text-gray-400 text-center p-4">
-                    {isProcessing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2" />
-                        <p>Processing video...</p>
-                      </>
-                    ) : hasFailed ? (
-                      <>
-                        <p className="text-red-500 mb-2">Processing failed</p>
-                        <p className="text-sm">{video.error}</p>
-                      </>
-                    ) : (
-                      "Thumbnail not available"
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Title Card with Gradient */}
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+                style={{
+                  background: getGradient(video.title),
+                  boxShadow: "inset 0 0 100px rgba(0,0,0,0.3)",
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-              {/* Overlay Content */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                {/* Action Buttons */}
+                <div className="absolute top-4 right-4 left-4 z-20 flex justify-between items-center">
+                  {isInCollection && (
+                    <button
+                      onClick={handleActionClick}
+                      className="p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-red-500/60 transition-colors group"
+                      title="Remove from collection"
+                    >
+                      <XMarkIcon className="h-8 w-8 text-white group-hover:text-white" />
+                    </button>
+                  )}
+                  <button
+                    onClick={handleInfoClick}
+                    className="p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors ml-auto"
+                  >
+                    <InformationCircleIcon className="h-8 w-8 text-white" />
+                  </button>
+                </div>
+
+                {/* Center Title */}
+                <div className="relative z-10 mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-2 text-shadow-lg">
+                    {video.title}
+                  </h2>
+                  {video.cuisine && (
+                    <div className="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-sm text-white">
+                      {video.cuisine}
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Content */}
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   {/* Title and Description */}
-                  <h3 className="text-lg font-semibold mb-1">
-                    {video.title || "Processing recipe..."}
-                  </h3>
                   <p className="text-sm text-gray-300 line-clamp-2 mb-2">
                     {video.description || "Analyzing video content..."}
                   </p>
@@ -253,54 +286,46 @@ export function VideoCard({ video, onLike }: VideoCardProps) {
                   {!isProcessing && !hasFailed && (
                     <div className="space-y-2">
                       {/* Time and Difficulty */}
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className="flex items-center">
-                          <ClockIcon className="h-4 w-4 mr-1" />
-                          <span>
-                            {formatDuration(
-                              metadata?.totalTime || video.cookingTime
-                            )}
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center">
+                            <ClockIcon className="h-4 w-4 mr-1" />
+                            <span>
+                              {formatDuration(
+                                metadata?.totalTime || video.cookingTime
+                              )}
+                            </span>
+                          </div>
+                          <span className="px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs">
+                            {video.difficulty}
                           </span>
                         </div>
-                        <span className="px-2 py-1 rounded-full bg-gray-700 text-xs">
-                          {video.difficulty}
-                        </span>
-                        <button
-                          onClick={handleInfoClick}
-                          className="flex items-center space-x-1 hover:text-purple-400 transition-colors"
-                        >
-                          <InformationCircleIcon className="h-5 w-5" />
-                        </button>
                       </div>
 
-                      {/* Cuisine and Tags */}
+                      {/* Tags */}
                       <div className="flex flex-wrap gap-2">
-                        {video.cuisine && (
-                          <span className="px-2 py-1 rounded-full bg-purple-900/50 text-xs">
-                            {video.cuisine}
-                          </span>
-                        )}
                         {suggestedHashtags.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-1 rounded-full bg-gray-700/50 text-xs"
+                            className="px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs"
                           >
-                            {tag}
+                            #{tag}
                           </span>
                         ))}
                       </div>
 
-                      {/* Stats */}
-                      <div className="flex items-center space-x-4 text-sm">
-                        <button
-                          onClick={handleLikeClick}
-                          className="flex items-center space-x-1 hover:text-purple-400 transition-colors"
-                        >
-                          <HeartIcon className="h-4 w-4" />
-                          <span>{video.likes}</span>
-                        </button>
-                        <span>{video.views} views</span>
-                      </div>
+                      {/* Like Button (only show in non-collection view) */}
+                      {!isInCollection && (
+                        <div className="flex items-center space-x-4 text-sm">
+                          <button
+                            onClick={handleActionClick}
+                            className="flex items-center space-x-1 hover:text-purple-400 transition-colors"
+                          >
+                            <HeartIcon className="h-4 w-4" />
+                            <span>{video.likes}</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
