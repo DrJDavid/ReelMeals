@@ -1,6 +1,11 @@
 {
+  "functions": {
+    "source": "functions",
+    "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run build"]
+  },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "storage": {
     "rules": "storage.rules"
@@ -37,17 +42,28 @@
   },
   "emulators": {
     "auth": {
-      "port": 9098
+      "port": 9099
+    },
+    "functions": {
+      "port": 5002,
+      "host": "localhost"
     },
     "firestore": {
-      "port": 8081
+      "port": 8080
     },
     "storage": {
-      "port": 9198
+      "port": 9199
     },
     "ui": {
       "enabled": true,
-      "port": 4040
+      "port": 4041,
+      "host": "localhost"
+    },
+    "hub": {
+      "port": 4402
+    },
+    "logging": {
+      "port": 4503
     },
     "singleProjectMode": true
   }

@@ -127,7 +127,10 @@ export function VideoPageContent() {
             </h2>
             <ul className="list-disc list-inside text-gray-300">
               {video.ingredients.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
+                <li key={index}>
+                  {ingredient.amount} {ingredient.unit} {ingredient.name}
+                  {ingredient.notes && ` (${ingredient.notes})`}
+                </li>
               ))}
             </ul>
           </div>

@@ -42,12 +42,12 @@ export async function getVideo(videoId: string) {
   return { id: docSnap.id, ...docSnap.data() } as FirestoreVideo;
 }
 
-export async function addVideo(
+export async function createVideo(
   video: Omit<FirestoreVideo, "id" | "createdAt" | "updatedAt">
-) {
+): Promise<FirestoreVideo> {
   if (!db) throw new Error("Firestore not initialized");
   const videosRef = collection(db, "videos");
-  const videoWithTimestamps = withTimestamps<Omit<FirestoreVideo, "id">>(video);
+  const videoWithTimestamps = withTimestamps(video);
   const docRef = await addDoc(videosRef, videoWithTimestamps);
   return { id: docRef.id, ...videoWithTimestamps };
 }
@@ -91,11 +91,10 @@ export async function getCollection(collectionId: string) {
 
 export async function createCollection(
   collectionData: Omit<FirestoreCollection, "id" | "createdAt" | "updatedAt">
-) {
+): Promise<FirestoreCollection> {
   if (!db) throw new Error("Firestore not initialized");
   const collectionsRef = collection(db, "collections");
-  const collectionWithTimestamps =
-    withTimestamps<Omit<FirestoreCollection, "id">>(collectionData);
+  const collectionWithTimestamps = withTimestamps(collectionData);
   const docRef = await addDoc(collectionsRef, collectionWithTimestamps);
   return { id: docRef.id, ...collectionWithTimestamps };
 }
@@ -190,10 +189,10 @@ export async function getUser(userId: string) {
 
 export async function createUser(
   user: Omit<FirestoreUser, "id" | "createdAt" | "updatedAt">
-) {
+): Promise<FirestoreUser> {
   if (!db) throw new Error("Firestore not initialized");
   const usersRef = collection(db, "users");
-  const userWithTimestamps = withTimestamps<FirestoreUser>(user);
+  const userWithTimestamps = withTimestamps(user);
   const docRef = await addDoc(usersRef, userWithTimestamps);
   return { id: docRef.id, ...userWithTimestamps };
 }

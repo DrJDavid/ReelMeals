@@ -5,6 +5,7 @@ import SwipeableView from "@/components/swipe/SwipeableView";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoFeed } from "@/hooks/useVideoFeed";
+import { mapFirestoreVideoToMetadata } from "@/lib/video-data";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -68,7 +69,7 @@ export default function FeedPageContent() {
           <>
             <SwipeableView onSwipeLeft={handleSkip} onSwipeRight={handleLike}>
               <SwipeCard
-                video={currentVideo}
+                video={mapFirestoreVideoToMetadata(currentVideo)}
                 onError={(error) => console.error("Video error:", error)}
               />
             </SwipeableView>

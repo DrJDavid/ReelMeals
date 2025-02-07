@@ -9,6 +9,11 @@ jest.mock("firebase/firestore", () => ({
   doc: jest.fn(),
   updateDoc: jest.fn(),
 }));
+jest.mock("firebase/functions", () => ({
+  getFunctions: jest.fn(),
+  httpsCallable: jest.fn(() => async () => ({ data: { success: true } })),
+  connectFunctionsEmulator: jest.fn(),
+}));
 
 describe("RecipeAnalysisService", () => {
   const mockVideoUrl = "https://storage.googleapis.com/test-video.mp4";
@@ -74,44 +79,70 @@ describe("RecipeAnalysisService", () => {
     }));
   });
 
-  describe("processVideo", () => {
-    it("should process a video successfully", async () => {
-      const result = await RecipeAnalysisService.processVideo(
-        mockVideoId,
-        mockVideoUrl
-      );
+  describe("processNewVideo", () => {
+    it("should process a new video successfully", async () => {
+      await RecipeAnalysisService.processNewVideo(mockVideoId, mockVideoUrl);
 
       // Verify the video was processed and status was updated
-      expect(result).toBeUndefined();
       expect(updateDoc).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ status: "active" })
+        expect.objectContaining({ status: "processing" })
       );
     });
 
     it("should handle video processing failure", async () => {
-      // Mock file manager to simulate processing failure
-      (GoogleAIFileManager as jest.Mock).mockImplementation(() => ({
-        uploadFile: jest.fn().mockResolvedValue({
-          file: {
-            name: "test-file",
-            uri: "test-uri",
-            mimeType: "video/mp4",
-          },
-        }),
-        getFile: jest.fn().mockResolvedValue({
-          state: FileState.FAILED,
-        }),
-      }));
+      // Mock the cloud function to throw an error
+      const mockError = new Error("Processing failed");
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      (httpsCallable as jest.Mock).mockImplementation(() => async () => {
+        throw mockError;
+      });
 
       await expect(
-        RecipeAnalysisService.processVideo(mockVideoId, mockVideoUrl)
-      ).rejects.toThrow("Failed to analyze video content");
+        RecipeAnalysisService.processNewVideo(mockVideoId, mockVideoUrl)
+      ).rejects.toThrow("Processing failed");
 
       // Verify status was updated to failed
       expect(updateDoc).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ status: "failed" })
+        expect.objectContaining({
+          status: "failed",
+          error: "Processing failed",
+        })
+      );
+    });
+  });
+
+  describe("analyzeExistingVideo", () => {
+    it("should analyze an existing video successfully", async () => {
+      await RecipeAnalysisService.analyzeExistingVideo(mockVideoId);
+
+      // Verify the video was processed and status was updated
+      expect(updateDoc).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ status: "processing" })
+      );
+    });
+
+    it("should handle analysis failure", async () => {
+      // Mock the cloud function to throw an error
+      const mockError = new Error("Analysis failed");
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      (httpsCallable as jest.Mock).mockImplementation(() => async () => {
+        throw mockError;
+      });
+
+      await expect(
+        RecipeAnalysisService.analyzeExistingVideo(mockVideoId)
+      ).rejects.toThrow("Analysis failed");
+
+      // Verify status was updated to failed
+      expect(updateDoc).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          status: "failed",
+          error: "Analysis failed",
+        })
       );
     });
   });

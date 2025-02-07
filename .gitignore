@@ -62,3 +62,17 @@ next-env.d.ts
 service-account.json
 *-service-account.json
 
+# Environment Variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase
+service-account.json
+**/firebase-adminsdk*.json
+
+# Secrets
+*.pem
+*.key
+

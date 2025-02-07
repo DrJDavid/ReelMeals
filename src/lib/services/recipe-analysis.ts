@@ -1,14 +1,17 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { doc, Timestamp, updateDoc } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import * as fs from "fs";
 import { db } from "../firebase/firebase-config";
 import { FirestoreVideo } from "../firebase/firestore-schema";
 
-// Initialize Gemini client with 2.0 Pro Experimental
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-pro-experimental",
-});
+// Initialize Firebase Functions
+const functions = getFunctions();
+
+// Connect to emulator in development
+if (process.env.NODE_ENV === "development") {
+  const { connectFunctionsEmulator } = require("firebase/functions");
+  connectFunctionsEmulator(functions, "localhost", 5002);
+}
 
 export interface RecipeAnalysisResult {
   ingredients: FirestoreVideo["ingredients"];
@@ -112,6 +115,17 @@ Please structure your response in a clear, detailed format that can be parsed pr
           detectedIngredients: ["ingredient1"],
           detectedTechniques: ["technique1"],
           confidenceScore: 0.95,
+          suggestedHashtags: ["#recipe", "#cooking"],
+          equipmentNeeded: ["pan", "stove"],
+          skillLevel: "beginner",
+          totalTime: 30,
+          prepTime: 10,
+          cookTime: 20,
+          estimatedCost: {
+            min: 1000, // $10.00
+            max: 2000, // $20.00
+            currency: "USD",
+          },
           lastProcessed: Timestamp.now(),
         },
       };
@@ -121,7 +135,10 @@ Please structure your response in a clear, detailed format that can be parsed pr
     }
   }
 
-  public static async processVideo(
+  /**
+   * Process a new video that's being uploaded
+   */
+  public static async processNewVideo(
     videoId: string,
     videoPath: string
   ): Promise<void> {
@@ -131,21 +148,54 @@ Please structure your response in a clear, detailed format that can be parsed pr
       // Update status to processing
       await updateDoc(videoRef, { status: "processing" });
 
-      // Analyze video content
-      const analysisResult = await this.analyzeVideoContent(videoPath);
+      // Call the cloud function
+      const analyzeVideo = httpsCallable(functions, "analyzeVideo");
+      const result = await analyzeVideo({ videoId });
 
-      // Update video document with analysis results
-      await updateDoc(videoRef, {
-        ...analysisResult,
-        status: "active",
-      });
+      console.log("Video analysis result:", result.data);
     } catch (error) {
       console.error("Error processing video:", error);
-      await updateDoc(videoRef, { status: "failed" });
+      await updateDoc(videoRef, {
+        status: "failed",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
       throw error;
     }
   }
 
+  /**
+   * Analyze an existing video that's already in Firestore
+   */
+  public static async analyzeExistingVideo(videoId: string): Promise<void> {
+    const videoRef = doc(db, "videos", videoId);
+
+    try {
+      // Update status to processing
+      await updateDoc(videoRef, { status: "processing" });
+
+      // Call the cloud function
+      const analyzeExistingVideo = httpsCallable(
+        functions,
+        "analyzeExistingVideo"
+      );
+      const result = await analyzeExistingVideo({ videoId });
+
+      console.log("Video analysis result:", result.data);
+    } catch (error) {
+      console.error("Error analyzing existing video:", error);
+      await updateDoc(videoRef, {
+        status: "failed",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Estimate prices for ingredients
+   */
   public static async estimateIngredientPrices(
     ingredients: FirestoreVideo["ingredients"]
   ): Promise<FirestoreVideo["ingredients"]> {

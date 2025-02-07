@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Process video
-    await RecipeAnalysisService.processVideo(videoId, videoUrl);
+    await RecipeAnalysisService.processNewVideo(videoId, videoUrl);
 
     return NextResponse.json({ success: true });
   } catch (error) {

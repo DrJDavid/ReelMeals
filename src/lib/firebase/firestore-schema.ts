@@ -7,9 +7,8 @@ export interface FirestoreVideo {
   title: string;
   description: string;
   cuisine: string;
-  cookingTime: number; // in minutes
   difficulty: "Easy" | "Medium" | "Hard";
-  chef: string;
+  cookingTime: number; // in minutes
   ingredients: Array<{
     name: string;
     amount: number;
@@ -35,15 +34,27 @@ export interface FirestoreVideo {
   likes: number;
   views: number;
   uploadedByUserId: string;
-  aiMetadata?: {
+  aiMetadata: {
     detectedIngredients: string[];
     detectedTechniques: string[];
     confidenceScore: number;
+    suggestedHashtags: string[];
+    equipmentNeeded: string[];
+    skillLevel: string;
+    totalTime: number; // in minutes
+    prepTime: number; // in minutes
+    cookTime: number; // in minutes
+    estimatedCost: {
+      min: number; // in cents
+      max: number; // in cents
+      currency: string;
+    };
     lastProcessed: Timestamp;
   };
   createdAt: Timestamp;
   updatedAt: Timestamp;
   status: "processing" | "active" | "failed";
+  error?: string;
 }
 
 export interface FirestoreCollection {
@@ -69,8 +80,8 @@ export interface FirestoreUser {
 
 // Helper function to convert timestamps
 export function withTimestamps<T extends Record<string, any>>(
-  data: Omit<T, "createdAt" | "updatedAt">
-): Omit<T, "createdAt" | "updatedAt"> & {
+  data: T
+): T & {
   createdAt: Timestamp;
   updatedAt: Timestamp;
 } {

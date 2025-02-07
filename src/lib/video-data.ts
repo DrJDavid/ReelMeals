@@ -1,3 +1,5 @@
+import { FirestoreVideo } from "./firebase/firestore-schema";
+
 export interface VideoMetadata {
   id: string;
   videoUrl: string;
@@ -223,3 +225,23 @@ export const TEST_VIDEOS: VideoMetadata[] = [
     views: 5430,
   },
 ];
+
+export function mapFirestoreVideoToMetadata(
+  firestoreVideo: FirestoreVideo
+): VideoMetadata {
+  return {
+    id: firestoreVideo.id,
+    videoUrl: firestoreVideo.videoUrl,
+    title: firestoreVideo.title,
+    cuisine: firestoreVideo.cuisine,
+    cookingTime: firestoreVideo.cookingTime,
+    difficulty: firestoreVideo.difficulty,
+    thumbnailUrl: firestoreVideo.thumbnailUrl,
+    chef: firestoreVideo.uploadedByUserId, // Using uploadedByUserId as chef for now
+    description: firestoreVideo.description,
+    ingredients: firestoreVideo.ingredients.map((i) => i.name),
+    tags: firestoreVideo.tags,
+    likes: firestoreVideo.likes,
+    views: firestoreVideo.views,
+  };
+}

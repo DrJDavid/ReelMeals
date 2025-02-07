@@ -3,7 +3,7 @@
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Logo } from "@/components/Logo";
 import { NavBar } from "@/components/NavBar";
-import VideoThumbnail from "@/components/video/VideoThumbnail";
+import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoModal } from "@/features/video/VideoModalContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
@@ -16,7 +16,6 @@ import {
 import {
   AdjustmentsHorizontalIcon,
   ChevronDownIcon,
-  XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 
@@ -130,10 +129,7 @@ export default function CollectionsPage() {
           return a.cookingTime - b.cookingTime;
         case "difficulty": {
           const difficultyOrder = { Easy: 0, Medium: 1, Hard: 2 };
-          return (
-            difficultyOrder[a.difficulty] -
-            difficultyOrder[b.difficulty]
-          );
+          return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty];
         }
         default:
           return 0;
@@ -308,41 +304,15 @@ export default function CollectionsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAndSortedVideos.map((video, index) => (
-                <div key={video.id} className="relative group">
-                  <button
-                    onClick={() => openVideo(video)}
-                    className="w-full group relative aspect-[9/16] bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all duration-200"
-                  >
-                    <VideoThumbnail
-                      title={video.title}
-                      cuisine={video.cuisine}
-                      difficulty={video.difficulty}
-                      className="w-full h-full"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h3 className="text-white font-semibold truncate">
-                          {video.title}
-                        </h3>
-                        <div className="flex items-center space-x-2 text-sm text-gray-300">
-                          <span>{video.cuisine}</span>
-                          <span>•</span>
-                          <span className="capitalize">{video.difficulty}</span>
-                          <span>•</span>
-                          <span>{video.cookingTime}min</span>
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => handleRemoveVideo(video.id)}
-                    disabled={removingVideo === video.id}
-                    className="absolute top-2 right-2 p-2 rounded-full bg-black/50 hover:bg-black/70 hover:text-red-500 transition-colors z-10"
-                  >
-                    <XMarkIcon className="w-6 h-6" />
-                  </button>
+              {filteredAndSortedVideos.map((video) => (
+                <div key={video.id} className="relative">
+                  <RecipeCard
+                    recipe={video}
+                    onLike={async () => {
+                      if (removingVideo === video.id) return;
+                      await handleRemoveVideo(video.id);
+                    }}
+                  />
                 </div>
               ))}
             </div>

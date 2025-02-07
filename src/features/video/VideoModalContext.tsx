@@ -2,6 +2,7 @@
 
 import { VideoModal } from "@/components/video/VideoModal";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
+import { mapFirestoreVideoToMetadata } from "@/lib/video-data";
 import { createContext, ReactNode, useContext, useState } from "react";
 
 interface VideoModalContextType {
@@ -33,10 +34,10 @@ export function VideoModalProvider({ children }: { children: ReactNode }) {
       {children}
       {videoData && (
         <VideoModal
-          isOpen={isOpen}
+          isOpen={!!videoData}
           onClose={closeVideo}
           videoUrl={videoData.videoUrl}
-          video={videoData}
+          video={mapFirestoreVideoToMetadata(videoData)}
         />
       )}
     </VideoModalContext.Provider>
