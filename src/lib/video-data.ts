@@ -1,19 +1,54 @@
 import { FirestoreVideo } from "./firebase/firestore-schema";
 
-export interface VideoMetadata {
-  id: string;
+export interface VideoMetadata extends Omit<FirestoreVideo, "id"> {
+  id?: string;
   videoUrl: string;
+  thumbnailUrl?: string;
   title: string;
-  cuisine: string;
-  cookingTime: number; // in minutes
-  difficulty: "Easy" | "Medium" | "Hard";
-  thumbnailUrl: string;
-  chef: string;
   description: string;
-  ingredients: string[];
-  tags: string[];
   likes: number;
   views: number;
+  status?: string;
+  error?: string;
+  analysis?: {
+    ingredients: Array<{
+      name: string;
+      amount: number;
+      unit: string;
+      estimatedPrice?: number;
+      notes?: string;
+    }>;
+    instructions: Array<{
+      step: number;
+      description: string;
+      timestamp?: number;
+      duration?: number;
+    }>;
+    nutrition: {
+      servings: number;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fat: number;
+      fiber: number;
+    };
+    aiMetadata: {
+      detectedIngredients: string[];
+      detectedTechniques: string[];
+      confidenceScore: number;
+      suggestedHashtags: string[];
+      equipmentNeeded: string[];
+      skillLevel: string;
+      totalTime: number;
+      prepTime: number;
+      cookTime: number;
+      estimatedCost: {
+        min: number;
+        max: number;
+        currency: string;
+      };
+    };
+  };
 }
 
 // Mock data for our test videos
@@ -227,21 +262,10 @@ export const TEST_VIDEOS: VideoMetadata[] = [
 ];
 
 export function mapFirestoreVideoToMetadata(
-  firestoreVideo: FirestoreVideo
+  video: FirestoreVideo
 ): VideoMetadata {
   return {
-    id: firestoreVideo.id,
-    videoUrl: firestoreVideo.videoUrl,
-    title: firestoreVideo.title,
-    cuisine: firestoreVideo.cuisine,
-    cookingTime: firestoreVideo.cookingTime,
-    difficulty: firestoreVideo.difficulty,
-    thumbnailUrl: firestoreVideo.thumbnailUrl,
-    chef: firestoreVideo.uploadedByUserId, // Using uploadedByUserId as chef for now
-    description: firestoreVideo.description,
-    ingredients: firestoreVideo.ingredients.map((i) => i.name),
-    tags: firestoreVideo.tags,
-    likes: firestoreVideo.likes,
-    views: firestoreVideo.views,
+    ...video,
+    id: video.id,
   };
 }

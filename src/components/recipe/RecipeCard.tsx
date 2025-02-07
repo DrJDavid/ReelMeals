@@ -16,15 +16,17 @@ interface RecipeCardProps {
   onLike?: () => void;
 }
 
-function RecipeInfoModal({
-  recipe,
-  isOpen,
-  onClose,
-}: {
+export interface RecipeInfoModalProps {
   recipe: FirestoreVideo;
   isOpen: boolean;
   onClose: () => void;
-}) {
+}
+
+export function RecipeInfoModal({
+  recipe,
+  isOpen,
+  onClose,
+}: RecipeInfoModalProps) {
   if (!isOpen) return null;
 
   const analysis = recipe.analysis || {};

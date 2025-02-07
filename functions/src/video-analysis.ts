@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import * as cors from "cors";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { defineString } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
-import { onObjectFinalized } from "firebase-functions/v2/storage";
 
 // Define config parameters
 const geminiKey = defineString("GEMINI_KEY");
@@ -14,6 +14,13 @@ initializeApp();
 
 const db = getFirestore();
 const storage = getStorage();
+
+// Initialize CORS middleware
+const corsHandler = cors({
+  origin: true, // This will reflect the request origin during development
+  credentials: true,
+  methods: ["POST", "OPTIONS"],
+});
 
 // Initialize Gemini client
 const genAI = new GoogleGenerativeAI(geminiKey.value());
@@ -35,10 +42,9 @@ interface VideoAnalysis {
   cookingTime: number;
   ingredients: Array<{
     name: string;
-    amount: number;
-    unit: string;
-    estimatedPrice?: number;
-    notes?: string;
+    amount: number | null;
+    unit: string | null;
+    notes?: string | null;
   }>;
   instructions: Array<{
     step: number;
@@ -47,12 +53,12 @@ interface VideoAnalysis {
     duration?: number;
   }>;
   nutrition: {
-    servings: number;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-    fiber: number;
+    servings: number | null;
+    calories: number | null;
+    protein: number | null;
+    carbs: number | null;
+    fat: number | null;
+    fiber: number | null;
   };
   tags: string[];
   aiMetadata: {
@@ -393,18 +399,6 @@ function logError(error: unknown, context: string) {
   });
 }
 
-// Add a function to check the cache
-async function checkCache(videoId: string): Promise<VideoAnalysis | null> {
-  const cacheRef = db.collection("videoAnalysisCache").doc(videoId);
-  const cacheDoc = await cacheRef.get();
-  if (cacheDoc.exists) {
-    console.log(`Cache hit for video ${videoId}`);
-    return cacheDoc.data() as VideoAnalysis;
-  }
-  console.log(`Cache miss for video ${videoId}`);
-  return null;
-}
-
 // Add a function to update the cache
 async function updateCache(videoId: string, analysis: VideoAnalysis) {
   const cacheRef = db.collection("videoAnalysisCache").doc(videoId);
@@ -413,71 +407,43 @@ async function updateCache(videoId: string, analysis: VideoAnalysis) {
 }
 
 // Update the main function to use caching
-export const analyzeVideo = onObjectFinalized(
+export const analyzeVideo = onRequest(
   {
     region: "us-central1",
     memory: "4GiB",
     timeoutSeconds: 540,
-    retry: true,
+    cors: true,
   },
-  async (event) => {
-    const startTime = Date.now();
+  async (req, res) => {
+    // Handle CORS preflight
+    await new Promise((resolve) => corsHandler(req, res, resolve));
+
+    // Only allow POST requests
+    if (req.method !== "POST") {
+      res.status(405).json({ error: "Method Not Allowed" });
+      return;
+    }
+
+    const { videoId, videoUrl } = req.body;
+    if (!videoId || !videoUrl) {
+      res
+        .status(400)
+        .json({ error: "Missing videoId or videoUrl in request body" });
+      return;
+    }
+
+    // Define docRef at the top level so it's available in the catch block
+    const docRef = db.collection("videos").doc(videoId);
+
     try {
-      // Only process videos in the videos/ directory
-      if (!event.data.name?.startsWith("videos/")) {
-        console.log("Not a video in videos/ directory, skipping");
-        return;
-      }
-
-      // Extract video ID from the file path
-      const videoId = event.data.name.split("/")[1].replace(".mp4", "");
-      console.log(`Processing video ${videoId}...`);
-
-      // Check the cache
-      const cachedAnalysis = await checkCache(videoId);
-      if (cachedAnalysis) {
-        // Update video document with cached results
-        const docRef = db.collection("videos").doc(videoId);
-        await docRef.update({
-          ...cachedAnalysis,
-          status: "active",
-          updatedAt: Timestamp.now(),
-        });
-        console.log(
-          `✅ Successfully processed ${videoId} from cache in ${
-            (Date.now() - startTime) / 1000
-          }s`
-        );
-        return;
-      }
-
-      // Get the video document
-      const docRef = db.collection("videos").doc(videoId);
-      const doc = await docRef.get();
-
-      if (!doc.exists) {
-        console.log(`No document found for video ${videoId}, skipping`);
-        return;
-      }
-
       // Update status to processing
       await docRef.update({
         status: "processing",
         updatedAt: Timestamp.now(),
       });
 
-      // Get signed URL for the video
-      const [signedUrl] = await storage
-        .bucket(event.data.bucket)
-        .file(event.data.name)
-        .getSignedUrl({
-          version: "v4",
-          action: "read",
-          expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-        });
-
       // Download video data
-      const response = await fetch(signedUrl);
+      const response = await fetch(videoUrl);
       if (!response.ok) {
         throw new Error(`Failed to download video: ${response.statusText}`);
       }
@@ -495,14 +461,32 @@ export const analyzeVideo = onObjectFinalized(
       // Update the cache
       await updateCache(videoId, analysis);
 
-      console.log(
-        `✅ Successfully processed ${videoId} in ${
-          (Date.now() - startTime) / 1000
-        }s`
-      );
+      res.status(200).json({
+        success: true,
+        videoId,
+        analysis: {
+          ingredients: analysis.ingredients,
+          instructions: analysis.instructions,
+          nutrition: analysis.nutrition,
+          aiMetadata: analysis.aiMetadata,
+        },
+      });
     } catch (error) {
-      logError(error, `video processing (${event.data.name})`);
-      throw error;
+      logError(error, `video processing (${videoId})`);
+
+      // Update video document with error status
+      await docRef.update({
+        status: "failed",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        updatedAt: Timestamp.now(),
+      });
+
+      res.status(500).json({
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
     }
   }
 );
