@@ -76,3 +76,7 @@ service-account.json
 *.pem
 *.key
 
+# Temporary files
+temp/
+**/temp/
+

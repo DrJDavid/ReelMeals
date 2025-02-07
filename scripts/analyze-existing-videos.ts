@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { config } from "dotenv";
 import * as admin from "firebase-admin";
 import * as fs from "fs";
+import fetch from "node-fetch";
 import * as path from "path";
 
 // Load environment variables
@@ -34,28 +35,116 @@ if (!fs.existsSync(TEMP_DIR)) {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function downloadVideo(videoId: string): Promise<string> {
-  const videoPath = path.join(TEMP_DIR, `${videoId}.mp4`);
+  console.log(`\nProcessing video ${videoId}...`);
 
-  try {
-    // Get the file from Firebase Storage
-    const bucket = storage.bucket();
-    const file = bucket.file(`burgers.mp4`);
-    const [exists] = await file.exists();
+  // List all files in the bucket to find our video
+  console.log("Listing all files in bucket...");
+  const [files] = await storage.bucket().getFiles();
+  const videoFiles = files.filter((file) => file.name.endsWith(".mp4"));
 
-    if (!exists) {
-      throw new Error(`Video file not found in storage: burgers.mp4`);
+  console.log("Found video files:");
+  videoFiles.forEach((file) => console.log(`- ${file.name}`));
+
+  // Get all processed videos to know which storage files have been handled
+  const processedSnapshot = await db
+    .collection("videos")
+    .where("status", "in", ["active", "processing"])
+    .get();
+
+  const processedVideoUrls = new Set<string>();
+  processedSnapshot.docs.forEach((doc) => {
+    const data = doc.data();
+    if (data.videoUrl) {
+      processedVideoUrls.add(data.videoUrl);
     }
+  });
 
-    // Download to temp directory
-    await file.download({
-      destination: videoPath,
+  // Get the current video document
+  const docRef = db.collection("videos").doc(videoId);
+  const doc = await docRef.get();
+  if (!doc.exists) {
+    throw new Error(`Video document ${videoId} not found in Firestore`);
+  }
+
+  const videoData = doc.data();
+  if (!videoData) {
+    throw new Error(`Video document ${videoId} has no data`);
+  }
+
+  // If the document already has a videoUrl, try to use that
+  let videoFile;
+  if (videoData.videoUrl) {
+    const urlPath = new URL(videoData.videoUrl).pathname;
+    const fileName = urlPath.split("/").pop();
+    if (fileName) {
+      const matchingFile = videoFiles.find((f) => f.name.endsWith(fileName));
+      if (matchingFile) {
+        console.log(`✅ Found video using existing URL: ${matchingFile.name}`);
+        videoFile = storage.bucket().file(matchingFile.name);
+      }
+    }
+  }
+
+  // If no match found, try to find an unprocessed video
+  if (!videoFile) {
+    console.log("Looking for an unprocessed video file...");
+    const unprocessedFile = videoFiles.find((file) => {
+      const fileUrl = `https://storage.googleapis.com/${
+        storage.bucket().name
+      }/${file.name}`;
+      return !processedVideoUrls.has(fileUrl);
     });
 
-    return videoPath;
-  } catch (error) {
-    console.error(`Error downloading video ${videoId}:`, error);
-    throw error;
+    if (unprocessedFile) {
+      console.log(`✅ Found unprocessed video: ${unprocessedFile.name}`);
+      videoFile = unprocessedFile;
+
+      // Update the document with the video URL
+      const videoUrl = `https://storage.googleapis.com/${
+        storage.bucket().name
+      }/${unprocessedFile.name}`;
+      await docRef.update({
+        videoUrl,
+        originalFilename: path.basename(unprocessedFile.name),
+        lastUpdated: new Date(),
+      });
+      console.log(`Updated document with video URL: ${videoUrl}`);
+    }
   }
+
+  if (!videoFile) {
+    throw new Error(
+      `No unprocessed videos found in storage for ID: ${videoId}`
+    );
+  }
+
+  // Generate a signed URL for downloading
+  console.log("Generating signed URL...");
+  const [signedUrl] = await videoFile.getSignedUrl({
+    version: "v4",
+    action: "read",
+    expires: Date.now() + 15 * 60 * 1000, // URL expires in 15 minutes
+  });
+  console.log("✅ Got signed URL");
+
+  // Download the video
+  console.log("Downloading video...");
+  const response = await fetch(signedUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to download video: ${response.statusText}`);
+  }
+
+  const tempDir = path.join(__dirname, "..", "temp");
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir);
+  }
+
+  const outputPath = path.join(tempDir, `${videoId}.mp4`);
+  const buffer = await response.arrayBuffer();
+  fs.writeFileSync(outputPath, Buffer.from(buffer));
+  console.log(`✅ Downloaded video to ${outputPath}`);
+
+  return outputPath;
 }
 
 async function cleanupVideo(videoPath: string) {
@@ -190,56 +279,63 @@ async function analyzeVideo(videoPath: string): Promise<VideoAnalysis> {
     const videoBase64 = videoBuffer.toString("base64");
 
     // Enhanced prompt for detailed analysis
-    const prompt = `Analyze this cooking video and provide a JSON response with the following structure. Return ONLY the JSON, no other text:
+    const prompt = `Watch this cooking video carefully and provide a detailed, unique analysis specific to this exact video. Return ONLY a JSON response with the following structure, ensuring all details are accurate and specific to this video:
 
 {
-  "title": "Recipe name",
-  "description": "Detailed description",
-  "cuisine": "Specific cuisine type",
-  "difficulty": "Easy/Medium/Hard",
-  "cookingTime": minutes,
+  "title": "Recipe name exactly as shown or mentioned",
+  "description": "Detailed description of what's actually demonstrated",
+  "cuisine": "Specific cuisine type based on ingredients and techniques shown",
+  "difficulty": "Easy/Medium/Hard based on techniques demonstrated",
+  "cookingTime": total minutes shown or estimated from video,
   "ingredients": [
     {
-      "name": "ingredient name",
-      "amount": number,
-      "unit": "unit",
-      "notes": "preparation notes"
+      "name": "ingredient name exactly as shown in video",
+      "amount": precise number or null if not shown,
+      "unit": "exact unit mentioned or shown, or null",
+      "notes": "specific preparation notes from video or null"
     }
   ],
   "instructions": [
     {
       "step": number,
-      "description": "instruction",
-      "timestamp": seconds_in_video,
-      "duration": step_duration
+      "description": "detailed step exactly as demonstrated in video",
+      "timestamp": exact seconds when step starts in video or null,
+      "duration": exact duration of step in seconds or null
     }
   ],
   "nutrition": {
-    "servings": number,
-    "calories": number,
-    "protein": number,
-    "carbs": number,
-    "fat": number,
-    "fiber": number
+    "servings": number based on recipe shown or null,
+    "calories": calculated per serving or null,
+    "protein": grams per serving or null,
+    "carbs": grams per serving or null,
+    "fat": grams per serving or null,
+    "fiber": grams per serving or null
   },
-  "tags": ["tag1", "tag2"],
+  "tags": ["relevant tags based on actual video content"],
   "aiMetadata": {
-    "detectedIngredients": ["ingredient1"],
-    "detectedTechniques": ["technique1"],
-    "confidenceScore": 0.0_to_1.0,
-    "suggestedHashtags": ["#tag1"],
-    "equipmentNeeded": ["tool1"],
-    "skillLevel": "beginner/intermediate/advanced",
-    "totalTime": minutes,
-    "prepTime": minutes,
-    "cookTime": minutes,
+    "detectedIngredients": ["list every ingredient shown or mentioned"],
+    "detectedTechniques": ["list all cooking techniques demonstrated"],
+    "confidenceScore": accuracy of analysis between 0 and 1,
+    "suggestedHashtags": ["relevant hashtags based on actual video content"],
+    "equipmentNeeded": ["all cooking equipment shown being used"],
+    "skillLevel": "beginner/intermediate/advanced based on techniques shown",
+    "totalTime": total minutes shown or estimated from video,
+    "prepTime": preparation minutes shown or estimated,
+    "cookTime": cooking minutes shown or estimated,
     "estimatedCost": {
-      "min": cents,
-      "max": cents,
+      "min": minimum cost in cents based on ingredients shown,
+      "max": maximum cost in cents based on ingredients shown,
       "currency": "USD"
     }
   }
-}`;
+}
+
+Important:
+1. Only include ingredients and steps actually shown in this specific video
+2. Be precise with measurements and timings seen in the video
+3. Base difficulty and times on what's demonstrated
+4. List equipment that's actually used in this video
+5. Ensure all details are unique to this particular recipe`;
 
     // Create parts array with the prompt and video data
     const parts = [
@@ -322,6 +418,9 @@ async function analyzeExistingVideos() {
 
         // Cleanup
         await cleanupVideo(videoPath);
+
+        // Add a delay between videos to avoid rate limiting
+        await delay(2000);
       } catch (error) {
         console.error(`Failed to analyze video ${video.id}:`, error);
         await videosRef.doc(video.id).update({
@@ -331,9 +430,6 @@ async function analyzeExistingVideos() {
           lastUpdated: new Date(),
         });
       }
-
-      // Add a delay between videos to avoid rate limiting
-      await delay(2000);
     }
 
     console.log("\nAnalysis complete. Final status:");
@@ -349,6 +445,11 @@ async function analyzeExistingVideos() {
     console.table(finalStatus);
   } catch (error) {
     console.error("Error analyzing videos:", error);
+  } finally {
+    // Clean up temp directory
+    if (fs.existsSync(TEMP_DIR)) {
+      fs.rmSync(TEMP_DIR, { recursive: true, force: true });
+    }
   }
 }
 
