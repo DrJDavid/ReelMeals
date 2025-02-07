@@ -10,6 +10,9 @@ import {
 } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
+const MAX_FILE_SIZE_MB = 100;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 interface UploadState {
   status: "idle" | "uploading" | "success" | "error" | "invalid";
   progress: number;
@@ -27,6 +30,16 @@ export function VideoUpload() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+
+    // Simple size check (100MB limit)
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadState({
+        status: "error",
+        progress: 0,
+        message: `File size exceeds ${MAX_FILE_SIZE_MB}MB limit`,
+      });
+      return;
+    }
 
     // Validate file type
     if (!file.type.startsWith("video/")) {
@@ -124,6 +137,10 @@ export function VideoUpload() {
                     style={{ width: `${uploadState.progress}%` }}
                   />
                 </div>
+                <p className="text-xs text-primary-400/80">
+                  {Math.round(uploadState.progress)}% •{" "}
+                  {(file.size / (1024 * 1024)).toFixed(1)}MB
+                </p>
               </div>
             ) : uploadState.status === "success" ? (
               <div className="space-y-1">
@@ -169,7 +186,7 @@ export function VideoUpload() {
           <li>• Should have clear steps or instructions</li>
           <li>• Should show ingredients being used</li>
           <li>• Must demonstrate cooking techniques</li>
-          <li>• Maximum file size: 100MB</li>
+          <li>• Maximum file size: {MAX_FILE_SIZE_MB}MB</li>
         </ul>
       </div>
     </div>

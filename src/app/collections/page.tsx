@@ -3,7 +3,7 @@
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Logo } from "@/components/Logo";
 import { NavBar } from "@/components/NavBar";
-import { RecipeCard } from "@/components/recipe/RecipeCard";
+import { VideoCard } from "@/components/video/VideoCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoModal } from "@/features/video/VideoModalContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
@@ -305,15 +305,11 @@ export default function CollectionsPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedVideos.map((video) => (
-                <div key={video.id} className="relative">
-                  <RecipeCard
-                    recipe={video}
-                    onLike={async () => {
-                      if (removingVideo === video.id) return;
-                      await handleRemoveVideo(video.id);
-                    }}
-                  />
-                </div>
+                <VideoCard
+                  key={video.id}
+                  video={video}
+                  onLike={() => handleRemoveVideo(video.id)}
+                />
               ))}
             </div>
           )}

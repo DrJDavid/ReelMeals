@@ -3,7 +3,7 @@
 import { GuestBanner } from "@/components/GuestBanner";
 import { Logo } from "@/components/Logo";
 import { NavBar } from "@/components/NavBar";
-import { RecipeCard } from "@/components/recipe/RecipeCard";
+import { VideoCard } from "@/components/video/VideoCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoModal } from "@/features/video/VideoModalContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
@@ -159,9 +159,9 @@ export default function SearchPageContent() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {videos.map((video) => (
-              <RecipeCard
+              <VideoCard
                 key={video.id}
-                recipe={video}
+                video={video}
                 onLike={() => handleLikeVideo(video.id)}
               />
             ))}
