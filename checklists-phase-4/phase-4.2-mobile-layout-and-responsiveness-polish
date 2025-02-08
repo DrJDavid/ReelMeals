@@ -1,0 +1,54 @@
+# Phase 4.2: Mobile Layout & Responsiveness Polish
+
+## Viewport Configuration
+
+- [x] Verify viewport meta tag in main layout file
+  ```html
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  ```
+
+## Responsive Testing with Chrome DevTools
+
+- [ ] Enable Device Toolbar testing
+  - Open Chrome DevTools (F12)
+  - Enable "Device Toolbar" (Ctrl+Shift+M or Cmd+Shift+M)
+
+### Test Common Mobile Screen Sizes
+- [ ] Video Feed Layout
+  - Verify videos are sized correctly
+  - Check vertical swipe smoothness
+  - Ensure proper spacing and alignment
+
+- [ ] SwipeCard Responsiveness
+  - Verify layout adapts to mobile screens
+  - Check metadata readability
+  - Test swipe gesture intuitiveness
+
+- [ ] Navigation Bar
+  - Verify bottom NavBar fits mobile screens
+  - Check touch targets are appropriate size
+  - Ensure no overlap with content
+
+- [ ] Text Readability
+  - Verify text is legible on smaller screens
+  - Check font sizes using TailwindCSS responsive modifiers
+  - Ensure proper contrast ratios
+
+## Mobile-First TailwindCSS Implementation
+
+- [ ] Review base mobile styles
+  - Verify default styles (no prefixes) are mobile-optimized
+  - Check padding and margins are appropriate for mobile
+
+- [ ] Responsive Design Implementation
+  - Use sm:, md:, lg:, xl: prefixes for larger screen adjustments
+  - Verify progressive enhancement approach
+  - Test breakpoint transitions
+
+## Layout Issue Resolution
+
+- [ ] Address specific mobile layout issues
+  - Fix any content overflow problems
+  - Resolve spacing inconsistencies
+  - Ensure proper touch target sizes (minimum 44x44 pixels)
+  - Check for and fix any z-index conflicts 

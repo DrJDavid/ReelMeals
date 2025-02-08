@@ -1,0 +1,54 @@
+# Phase 4.1: PWA Installability & "Browser Element" Removal
+
+## Review manifest.json (in public/)
+
+- [x] display property set to "standalone" or "fullscreen"
+  - Ensure manifest.json has "display": "standalone" (or "display": "fullscreen") to remove browser UI elements when installed
+
+- [x] start_url is correctly set
+  - Verify start_url is set to the root path ("/") or desired starting page
+
+- [x] icons array is properly configured
+  - Include icons of various sizes (36x36 to 512x512)
+  - Include appropriate sizes for iOS (152x152, 180x180)
+  - Include "purpose": "maskable" for Android adaptive icons
+  - All icon paths verified and working
+
+- [x] name and short_name are set
+  - App name and short name are defined appropriately
+
+- [x] background_color and theme_color are set
+  - background_color set to "#ffffff"
+  - theme_color set to brand color "#8b5cf6"
+
+- [x] Validate manifest.json
+  - All required fields present and correctly formatted
+  - Icon paths and sizes properly configured
+  - Screenshots section added (to be populated later)
+
+## Test PWA Installation
+
+### Android Testing
+- [ ] Test "Add to Home screen" functionality
+  - Install PWA on Android device using Chrome's "Add to Home screen" option
+  - Verify app icon looks correct on home screen
+  - Verify app opens in standalone mode (no browser address bar, minimal browser UI)
+
+### iOS Testing
+- [ ] Test "Add to Home screen" functionality in Safari
+  - Install PWA using Safari's "Add to Home Screen" (Share Sheet -> Add to Home Screen)
+  - Verify app icon looks correct on home screen
+  - Verify app opens in standalone mode (no browser UI)
+
+## Service Worker Scope Check
+
+- [x] Verify service worker scope is set to root (/)
+  - Check service worker registration code (managed by next-pwa)
+  - Ensure scope is set to '/' for complete app control
+  - Verify offline functionality and PWA behavior
+
+## Additional Enhancements
+- [x] Added comprehensive icon sizes (36x36 to 512x512)
+- [x] Updated theme color to match brand (#8b5cf6)
+- [x] Prepared screenshots directory structure
+- [ ] TODO: Capture and add actual app screenshots once UI is finalized 

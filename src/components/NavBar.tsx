@@ -6,6 +6,7 @@ import {
   HomeIcon,
   MagnifyingGlassIcon,
   PlayIcon,
+  PlusCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -55,6 +56,18 @@ export function NavBar() {
           >
             <MagnifyingGlassIcon className="w-6 h-6" />
             <span className="text-xs mt-1">Search</span>
+          </Link>
+
+          <Link
+            href="/upload"
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              isActive("/upload")
+                ? "text-primary-500"
+                : "text-gray-400 hover:text-gray-300"
+            }`}
+          >
+            <PlusCircleIcon className="w-6 h-6" />
+            <span className="text-xs mt-1">Upload</span>
           </Link>
 
           <Link

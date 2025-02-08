@@ -5,6 +5,7 @@ import SwipeableView from "@/components/swipe/SwipeableView";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoFeed } from "@/hooks/useVideoFeed";
+import { mapFirestoreVideoToMetadata } from "@/lib/video-data";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -45,7 +46,7 @@ export default function FeedPageContent() {
   );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-900 pb-20">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900">
       {isGuestMode && <GuestBanner />}
 
       {/* Logo/Title Section */}
@@ -62,18 +63,19 @@ export default function FeedPageContent() {
         </div>
       </div>
 
-      <div className="w-full max-w-md">
+      {/* Main content with proper spacing */}
+      <div className="w-full max-w-md px-4 pb-24 pt-20">
         {!isLastVideo && currentVideo ? (
           <>
             <SwipeableView onSwipeLeft={handleSkip} onSwipeRight={handleLike}>
               <SwipeCard
-                video={currentVideo}
+                video={mapFirestoreVideoToMetadata(currentVideo)}
                 onError={(error) => console.error("Video error:", error)}
               />
             </SwipeableView>
 
             {/* Swipe Instructions */}
-            <div className="mt-6 flex justify-between text-gray-400 text-sm px-4">
+            <div className="mt-6 flex justify-between text-gray-400 text-sm">
               <div className="flex flex-col items-center">
                 <span className="text-red-500 text-lg mb-1">←</span>
                 <span>Swipe left to skip</span>

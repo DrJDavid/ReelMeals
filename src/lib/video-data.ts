@@ -1,17 +1,54 @@
-export interface VideoMetadata {
-  id: string;
+import { FirestoreVideo } from "./firebase/firestore-schema";
+
+export interface VideoMetadata extends Omit<FirestoreVideo, "id"> {
+  id?: string;
   videoUrl: string;
+  thumbnailUrl?: string;
   title: string;
-  cuisine: string;
-  cookingTime: number; // in minutes
-  difficulty: "Easy" | "Medium" | "Hard";
-  thumbnailUrl: string;
-  chef: string;
   description: string;
-  ingredients: string[];
-  tags: string[];
   likes: number;
   views: number;
+  status?: string;
+  error?: string;
+  analysis?: {
+    ingredients: Array<{
+      name: string;
+      amount: number;
+      unit: string;
+      estimatedPrice?: number;
+      notes?: string;
+    }>;
+    instructions: Array<{
+      step: number;
+      description: string;
+      timestamp?: number;
+      duration?: number;
+    }>;
+    nutrition: {
+      servings: number;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fat: number;
+      fiber: number;
+    };
+    aiMetadata: {
+      detectedIngredients: string[];
+      detectedTechniques: string[];
+      confidenceScore: number;
+      suggestedHashtags: string[];
+      equipmentNeeded: string[];
+      skillLevel: string;
+      totalTime: number;
+      prepTime: number;
+      cookTime: number;
+      estimatedCost: {
+        min: number;
+        max: number;
+        currency: string;
+      };
+    };
+  };
 }
 
 // Mock data for our test videos
@@ -223,3 +260,12 @@ export const TEST_VIDEOS: VideoMetadata[] = [
     views: 5430,
   },
 ];
+
+export function mapFirestoreVideoToMetadata(
+  video: FirestoreVideo
+): VideoMetadata {
+  return {
+    ...video,
+    id: video.id,
+  };
+}

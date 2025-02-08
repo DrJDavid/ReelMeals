@@ -3,7 +3,7 @@
 import { GuestBanner } from "@/components/GuestBanner";
 import { Logo } from "@/components/Logo";
 import { NavBar } from "@/components/NavBar";
-import VideoThumbnail from "@/components/video/VideoThumbnail";
+import { VideoCard } from "@/components/video/VideoCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoModal } from "@/features/video/VideoModalContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
@@ -13,8 +13,6 @@ import {
   removeVideoFromUserCollection,
   saveVideoToCollection,
 } from "@/lib/firebase/firestore-service";
-import { HeartIcon } from "@heroicons/react/24/outline";
-import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -160,48 +158,12 @@ export default function SearchPageContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video, index) => (
-              <div key={video.id} className="relative group">
-                <button
-                  onClick={() => openVideo(video)}
-                  className="w-full group relative aspect-[9/16] bg-gray-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition-all duration-200"
-                >
-                  <VideoThumbnail
-                    title={video.title}
-                    cuisine={video.cuisine}
-                    difficulty={video.difficulty}
-                    className="w-full h-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="text-white font-semibold truncate">
-                        {video.title}
-                      </h3>
-                      <div className="flex items-center space-x-2 text-sm text-gray-300">
-                        <span>{video.cuisine}</span>
-                        <span>•</span>
-                        <span className="capitalize">{video.difficulty}</span>
-                        <span>•</span>
-                        <span>{video.cookingTime}min</span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-
-                {user && (
-                  <button
-                    onClick={() => handleLikeVideo(video.id)}
-                    disabled={savingVideo === video.id}
-                    className="absolute top-2 right-2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
-                  >
-                    {savedVideos.has(video.id) ? (
-                      <HeartIconSolid className="w-6 h-6 text-primary-500" />
-                    ) : (
-                      <HeartIcon className="w-6 h-6 text-white" />
-                    )}
-                  </button>
-                )}
-              </div>
+            {videos.map((video) => (
+              <VideoCard
+                key={video.id}
+                video={video}
+                onLike={() => handleLikeVideo(video.id)}
+              />
             ))}
           </div>
         )}

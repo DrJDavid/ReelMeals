@@ -1,8 +1,13 @@
 "use client";
 
+import { RecipeInfoModal } from "@/components/recipe/RecipeCard";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoMetadata } from "@/lib/video-data";
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  InformationCircleIcon,
+} from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 interface SwipeCardProps {
@@ -12,6 +17,7 @@ interface SwipeCardProps {
 
 export default function SwipeCard({ video, onError }: SwipeCardProps) {
   const [showDescription, setShowDescription] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
 
   return (
     <div className="w-full max-w-md mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-lg">
@@ -25,9 +31,18 @@ export default function SwipeCard({ video, onError }: SwipeCardProps) {
         />
 
         {/* Content Overlays */}
-        <div className="absolute inset-0 flex flex-col pointer-events-none">
+        <div className="absolute inset-0 flex flex-col">
           {/* Top Gradient */}
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 to-transparent">
+            {/* Info Button */}
+            <button
+              onClick={() => setShowInfo(true)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-20"
+              aria-label="Show recipe information"
+            >
+              <InformationCircleIcon className="h-6 w-6" />
+            </button>
+          </div>
 
           {/* Bottom Gradient and Content */}
           <div
@@ -107,6 +122,13 @@ export default function SwipeCard({ video, onError }: SwipeCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Recipe Info Modal */}
+      <RecipeInfoModal
+        recipe={video}
+        isOpen={showInfo}
+        onClose={() => setShowInfo(false)}
+      />
     </div>
   );
 }
