@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import * as cors from "cors";
+import cors from "cors";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
@@ -17,7 +17,7 @@ const storage = getStorage();
 
 // Initialize CORS middleware
 const corsHandler = cors({
-  origin: true, // This will reflect the request origin during development
+  origin: true,
   credentials: true,
   methods: ["POST", "OPTIONS"],
 });
@@ -389,16 +389,6 @@ function mergeAnalyses(analyses: Partial<VideoAnalysis>[]): VideoAnalysis {
   return merged;
 }
 
-// Add error monitoring
-function logError(error: unknown, context: string) {
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  console.error(`Error in ${context}:`, {
-    message: errorMessage,
-    stack: error instanceof Error ? error.stack : undefined,
-    timestamp: new Date().toISOString(),
-  });
-}
-
 // Add a function to update the cache
 async function updateCache(videoId: string, analysis: VideoAnalysis) {
   const cacheRef = db.collection("videoAnalysisCache").doc(videoId);
@@ -436,6 +426,8 @@ export const analyzeVideo = onRequest(
     const docRef = db.collection("videos").doc(videoId);
 
     try {
+      console.log(`Starting analysis for video ${videoId}`);
+
       // Update status to processing
       await docRef.update({
         status: "processing",
@@ -443,36 +435,42 @@ export const analyzeVideo = onRequest(
       });
 
       // Download video data
+      console.log("Downloading video...");
       const response = await fetch(videoUrl);
       if (!response.ok) {
         throw new Error(`Failed to download video: ${response.statusText}`);
       }
 
       const videoBuffer = await response.arrayBuffer();
+      console.log("Processing video in chunks...");
       const analysis = await processVideoInChunks(videoBuffer);
 
       // Update video document with analysis results
-      await docRef.update({
+      console.log("Updating video document with analysis...");
+      const updateData = {
         ...analysis,
-        status: "active",
+        status: "ready",
         updatedAt: Timestamp.now(),
-      });
+        title: analysis.title || "Untitled Recipe",
+        description: analysis.description || "",
+        cuisine: analysis.cuisine || "Unknown",
+        difficulty: analysis.difficulty || "Medium",
+        cookingTime: analysis.cookingTime || 0,
+      };
+
+      await docRef.update(updateData);
 
       // Update the cache
       await updateCache(videoId, analysis);
 
+      console.log(`✅ Successfully analyzed video ${videoId}`);
       res.status(200).json({
         success: true,
         videoId,
-        analysis: {
-          ingredients: analysis.ingredients,
-          instructions: analysis.instructions,
-          nutrition: analysis.nutrition,
-          aiMetadata: analysis.aiMetadata,
-        },
+        analysis,
       });
     } catch (error) {
-      logError(error, `video processing (${videoId})`);
+      console.error(`❌ Error processing video ${videoId}:`, error);
 
       // Update video document with error status
       await docRef.update({
