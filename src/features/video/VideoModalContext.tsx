@@ -1,9 +1,8 @@
 "use client";
 
-import { VideoModal } from "@/components/video/VideoModal";
+import { VideoPageContent } from "@/components/video/VideoPageContent";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
-import { mapFirestoreVideoToMetadata } from "@/lib/video-data";
-import { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 interface VideoModalContextType {
   openVideo: (video: FirestoreVideo) => void;
@@ -14,31 +13,32 @@ const VideoModalContext = createContext<VideoModalContextType | undefined>(
   undefined
 );
 
-export function VideoModalProvider({ children }: { children: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [videoData, setVideoData] = useState<FirestoreVideo | null>(null);
+export function VideoModalProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [currentVideo, setCurrentVideo] = useState<FirestoreVideo | null>(null);
 
   const openVideo = (video: FirestoreVideo) => {
-    setVideoData(video);
-    setIsOpen(true);
+    setCurrentVideo(video);
   };
 
   const closeVideo = () => {
-    setIsOpen(false);
-    // Clear video data after animation completes
-    setTimeout(() => setVideoData(null), 200);
+    setCurrentVideo(null);
   };
 
   return (
     <VideoModalContext.Provider value={{ openVideo, closeVideo }}>
       {children}
-      {videoData && (
-        <VideoModal
-          isOpen={!!videoData}
-          onClose={closeVideo}
-          videoUrl={videoData.videoUrl}
-          video={mapFirestoreVideoToMetadata(videoData)}
-        />
+      {currentVideo && (
+        <div className="fixed inset-0 z-50 bg-black/90">
+          <VideoPageContent
+            video={currentVideo}
+            uploaderName="ReelMeals"
+            onLike={() => {}}
+          />
+        </div>
       )}
     </VideoModalContext.Provider>
   );
@@ -46,7 +46,7 @@ export function VideoModalProvider({ children }: { children: ReactNode }) {
 
 export function useVideoModal() {
   const context = useContext(VideoModalContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useVideoModal must be used within a VideoModalProvider");
   }
   return context;

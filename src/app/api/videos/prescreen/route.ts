@@ -18,37 +18,87 @@ function cleanAIResponse(text: string): string {
     .trim();
 }
 
+// CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Since this is our own API route, we can be permissive
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Max-Age": "86400",
+};
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      ...corsHeaders,
+      "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Add CORS headers to all responses
+    const response = (data: any, status = 200) => {
+      return NextResponse.json(data, {
+        status,
+        headers: {
+          ...corsHeaders,
+          "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+        },
+      });
+    };
+
     // Verify authentication
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return response(
+        {
+          error: "Unauthorized",
+          details: "Missing or invalid authorization header",
+        },
+        401
+      );
     }
 
     const token = authHeader.split("Bearer ")[1];
-    const decodedToken = await auth.verifyIdToken(token);
-
-    if (!decodedToken.uid) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    try {
+      const decodedToken = await auth.verifyIdToken(token);
+      if (!decodedToken.uid) {
+        return response(
+          { error: "Unauthorized", details: "Invalid token" },
+          401
+        );
+      }
+    } catch (error) {
+      console.error("Token verification error:", error);
+      return response(
+        { error: "Unauthorized", details: "Token verification failed" },
+        401
+      );
     }
 
     // Get video URL from request
-    const { videoUrl } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const { videoUrl } = body;
 
     if (!videoUrl) {
-      return NextResponse.json(
-        { error: "No video URL provided" },
-        { status: 400 }
+      return response(
+        { error: "Bad Request", details: "No video URL provided" },
+        400
       );
     }
 
     // Download video content
     const fetchResponse = await fetch(videoUrl);
     if (!fetchResponse.ok) {
-      return NextResponse.json(
-        { error: "Failed to fetch video" },
-        { status: 400 }
+      return response(
+        {
+          error: "Bad Request",
+          details: `Failed to fetch video: ${fetchResponse.statusText}`,
+        },
+        400
       );
     }
 
@@ -87,24 +137,25 @@ Requirements for a valid cooking video (confidence should be at least 0.85):
       },
     ];
 
-    // Generate pre-screening content with Gemini
-    const preScreenResult = await model.generateContent(preScreenParts);
-    const preScreenResponse = await preScreenResult.response;
-    const preScreenText = cleanAIResponse(preScreenResponse.text());
+    try {
+      // Generate pre-screening content with Gemini
+      const preScreenResult = await model.generateContent(preScreenParts);
+      const preScreenResponse = await preScreenResult.response;
+      const preScreenText = cleanAIResponse(preScreenResponse.text());
 
-    // Parse the pre-screening response
-    const preScreenData = JSON.parse(preScreenText);
+      // Parse the pre-screening response
+      const preScreenData = JSON.parse(preScreenText);
 
-    // If video is not valid or confidence is too low, reject it
-    if (!preScreenData.isCookingVideo || preScreenData.confidence < 0.85) {
-      return NextResponse.json({
-        ...preScreenData,
-        analysis: null,
-      });
-    }
+      // If video is not valid or confidence is too low, reject it
+      if (!preScreenData.isCookingVideo || preScreenData.confidence < 0.85) {
+        return response({
+          ...preScreenData,
+          analysis: null,
+        });
+      }
 
-    // If video is valid, proceed with full analysis
-    const analysisPrompt = `Watch this cooking video carefully and provide a detailed, unique analysis specific to this exact video. Return ONLY a JSON response with the following structure, ensuring all details are accurate and specific to this video:
+      // If video is valid, proceed with full analysis
+      const analysisPrompt = `Watch this cooking video carefully and provide a detailed, unique analysis specific to this exact video. Return ONLY a JSON response with the following structure, ensuring all details are accurate and specific to this video:
 
 {
   "ingredients": [
@@ -156,35 +207,48 @@ Important:
 4. List equipment that's actually used in this video
 5. Ensure all details are unique to this particular recipe`;
 
-    // Create parts array for full analysis
-    const analysisParts = [
-      { text: analysisPrompt },
-      {
-        inlineData: {
-          mimeType: "video/mp4",
-          data: videoBase64,
+      // Create parts array for full analysis
+      const analysisParts = [
+        { text: analysisPrompt },
+        {
+          inlineData: {
+            mimeType: "video/mp4",
+            data: videoBase64,
+          },
         },
-      },
-    ];
+      ];
 
-    // Generate analysis content with Gemini
-    const analysisResult = await model.generateContent(analysisParts);
-    const analysisResponse = await analysisResult.response;
-    const analysisText = cleanAIResponse(analysisResponse.text());
+      // Generate analysis content with Gemini
+      const analysisResult = await model.generateContent(analysisParts);
+      const analysisResponse = await analysisResult.response;
+      const analysisText = cleanAIResponse(analysisResponse.text());
 
-    // Parse the analysis response
-    const analysisData = JSON.parse(analysisText);
+      // Parse the analysis response
+      const analysisData = JSON.parse(analysisText);
 
-    // Return both pre-screening and analysis results
-    return NextResponse.json({
-      ...preScreenData,
-      analysis: analysisData,
-    });
+      // Return both pre-screening and analysis results
+      return response({
+        ...preScreenData,
+        analysis: analysisData,
+      });
+    } catch (error) {
+      console.error("Error in AI processing:", error);
+      return response(
+        {
+          error: "AI Processing Error",
+          details: error instanceof Error ? error.message : "Unknown error",
+        },
+        500
+      );
+    }
   } catch (error) {
     console.error("Error processing video:", error);
-    return NextResponse.json(
-      { error: "Failed to process video" },
-      { status: 500 }
+    return response(
+      {
+        error: "Internal Server Error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500
     );
   }
 }

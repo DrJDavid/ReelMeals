@@ -11,7 +11,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-gray-900 text-white">
       {/* Hero Section */}
-      <div className="relative h-screen">
+      <div className="relative min-h-screen">
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -25,22 +25,22 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
-        <div className="relative h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600">
+        <div className="relative h-full flex flex-col items-center justify-center px-4 py-16">
+          <div className="text-center max-w-md mx-auto">
+            <h1 className="text-4xl sm:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-600">
               Welcome to ReelMeals
             </h1>
-            <p className="text-xl sm:text-2xl mb-12 max-w-2xl mx-auto text-gray-300">
+            <p className="text-lg sm:text-xl mb-12 text-gray-300">
               Discover amazing cooking videos with just a swipe. Learn, cook,
               and share your culinary journey.
             </p>
 
-            <div className="space-y-4 sm:space-y-0 sm:space-x-4 flex flex-col sm:flex-row justify-center">
+            <div className="flex flex-col space-y-4">
               {user ? (
                 // Logged in user
                 <Link
                   href="/feed"
-                  className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-gray-100 md:text-lg"
+                  className="w-full px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors text-center"
                 >
                   Go to Feed
                 </Link>
@@ -49,52 +49,54 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="/auth/login"
-                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-black bg-white hover:bg-gray-100 md:text-lg"
+                    className="w-full px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors text-center"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-black md:text-lg"
+                    className="w-full px-8 py-3 border border-white text-white font-medium rounded-lg hover:bg-white hover:text-black transition-colors text-center"
                   >
                     Create Account
                   </Link>
+                  <Link
+                    href="/feed?mode=guest"
+                    className="w-full px-8 py-3 border border-gray-400 text-gray-300 font-medium rounded-lg hover:border-white hover:text-white transition-colors text-center"
+                  >
+                    Try as Guest
+                  </Link>
                 </>
               )}
-              <Link
-                href="/feed?mode=guest"
-                className="inline-flex items-center justify-center px-8 py-3 border border-gray-400 text-base font-medium rounded-md text-gray-300 bg-transparent hover:border-white hover:text-white md:text-lg"
-              >
-                Try as Guest
-              </Link>
             </div>
           </div>
 
           {/* Features Grid */}
-          <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
-            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-              <h3 className="text-xl font-semibold mb-2 text-primary-400">
-                Discover
-              </h3>
-              <p className="text-gray-300">
-                Find new recipes and cooking techniques with intuitive swipes
-              </p>
-            </div>
-            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-              <h3 className="text-xl font-semibold mb-2 text-primary-400">
-                Learn
-              </h3>
-              <p className="text-gray-300">
-                Watch step-by-step video guides from expert chefs
-              </p>
-            </div>
-            <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-              <h3 className="text-xl font-semibold mb-2 text-primary-400">
-                Save
-              </h3>
-              <p className="text-gray-300">
-                Create collections of your favorite recipes
-              </p>
+          <div className="mt-16 w-full max-w-md mx-auto px-4">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                  Discover
+                </h3>
+                <p className="text-gray-300">
+                  Find new recipes and cooking techniques with intuitive swipes
+                </p>
+              </div>
+              <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                  Learn
+                </h3>
+                <p className="text-gray-300">
+                  Watch step-by-step video guides from expert chefs
+                </p>
+              </div>
+              <div className="text-center p-6 backdrop-blur-sm bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                <h3 className="text-xl font-semibold mb-2 text-primary-400">
+                  Save
+                </h3>
+                <p className="text-gray-300">
+                  Create collections of your favorite recipes
+                </p>
+              </div>
             </div>
           </div>
         </div>

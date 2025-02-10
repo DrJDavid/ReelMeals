@@ -1,36 +1,57 @@
 "use client";
 
-import { RecipeInfoModal } from "@/components/recipe/RecipeCard";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
-import { VideoMetadata } from "@/lib/video-data";
+import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
+import { getUserDisplayName } from "@/lib/firebase/firestore-service";
+import { processVideoMetadata } from "@/lib/video-data";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { RecipeViewer } from "../recipe/RecipeViewer";
 
 interface SwipeCardProps {
-  video: VideoMetadata;
+  video: FirestoreVideo;
   onError?: (error: any) => void;
 }
 
 export default function SwipeCard({ video, onError }: SwipeCardProps) {
   const [showDescription, setShowDescription] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
+  const [uploaderName, setUploaderName] = useState("ReelMeals");
+
+  useEffect(() => {
+    async function fetchUploaderName() {
+      if (!video.uploadedByUserId) {
+        setUploaderName("ReelMeals");
+        return;
+      }
+      try {
+        const name = await getUserDisplayName(video.uploadedByUserId);
+        setUploaderName(name);
+      } catch (error) {
+        console.error("Error fetching uploader name:", error);
+        setUploaderName("ReelMeals");
+      }
+    }
+    fetchUploaderName();
+  }, [video.uploadedByUserId]);
+
+  // Process video metadata once
+  const metadata = processVideoMetadata(video);
 
   return (
-    <div className="w-full max-w-md mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-lg">
-      <div className="relative">
+    <>
+      <div className="relative w-full h-full">
         <VideoPlayer
-          videoUrl={video.videoUrl}
+          videoUrl={metadata.videoUrl}
           autoPlay={true}
-          muted={true}
           loop={true}
           onError={onError}
         />
 
-        {/* Content Overlays */}
         <div className="absolute inset-0 flex flex-col">
           {/* Top Gradient */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 to-transparent">
@@ -74,42 +95,44 @@ export default function SwipeCard({ video, onError }: SwipeCardProps) {
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="text-lg font-bold text-white">
-                    {video.title}
+                    {metadata.title}
                   </h2>
-                  <p className="text-sm text-white/90">by {video.chef}</p>
+                  <p className="text-sm text-white/90">by {uploaderName}</p>
                 </div>
                 <div className="flex items-center space-x-2 bg-black/50 px-2 py-1 rounded">
-                  <span className="text-sm text-white">{video.difficulty}</span>
+                  <span className="text-sm text-white">
+                    {metadata.difficulty}
+                  </span>
                   <span className="text-white">•</span>
                   <span className="text-sm text-white">
-                    {video.cookingTime}min
+                    {metadata.totalTime}min
                   </span>
                 </div>
               </div>
 
               {/* Description */}
               <p className="text-sm text-white/90 line-clamp-2">
-                {video.description}
+                {metadata.description}
               </p>
 
               {/* Cuisine and Stats */}
               <div className="flex items-center justify-between">
                 <span className="text-sm bg-black/50 px-2 py-1 rounded text-white">
-                  {video.cuisine}
+                  {metadata.cuisine}
                 </span>
                 <div className="flex items-center space-x-4 text-sm text-white">
                   <span className="flex items-center">
-                    👍 {video.likes.toLocaleString()}
+                    👍 {metadata.likes.toLocaleString()}
                   </span>
                   <span className="flex items-center">
-                    👁️ {video.views.toLocaleString()}
+                    👁️ {metadata.views.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Tags */}
               <div className="flex flex-wrap gap-1 pb-2">
-                {video.tags.map((tag) => (
+                {metadata.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
                     className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white"
@@ -124,11 +147,12 @@ export default function SwipeCard({ video, onError }: SwipeCardProps) {
       </div>
 
       {/* Recipe Info Modal */}
-      <RecipeInfoModal
-        recipe={video}
+      <RecipeViewer
+        video={video}
         isOpen={showInfo}
         onClose={() => setShowInfo(false)}
+        uploaderName={uploaderName}
       />
-    </div>
+    </>
   );
 }

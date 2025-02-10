@@ -6,7 +6,8 @@ import { useAuth } from "@/features/auth/AuthContext";
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
 import { getVideo } from "@/lib/firebase/firestore-service";
 import { formatDuration } from "@/lib/utils/format";
-import { ClockIcon, HeartIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { processVideoMetadata } from "@/lib/video-data";
+import { ScaleIcon } from "@heroicons/react/24/outline";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -75,6 +76,8 @@ export function RecipePageContent() {
     return null;
   }
 
+  const metadata = processVideoMetadata(recipe);
+
   return (
     <div className="min-h-screen bg-gray-900">
       <NavBar />
@@ -87,122 +90,242 @@ export function RecipePageContent() {
 
           {/* Recipe Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-4">
-              {recipe.title}
+            <h1 className="text-3xl font-bold text-white mb-2">
+              {metadata.title}
             </h1>
-            <div className="flex flex-wrap gap-4 text-gray-300">
-              <div className="flex items-center">
-                <ClockIcon className="h-5 w-5 mr-2" />
-                <span>{formatDuration(recipe.cookingTime)}</span>
-              </div>
-              <div className="flex items-center">
-                <HeartIcon className="h-5 w-5 mr-2" />
-                <span>{recipe.likes} likes</span>
-              </div>
-              <button className="flex items-center text-gray-300 hover:text-white transition-colors">
-                <ShareIcon className="h-5 w-5 mr-2" />
-                Share
-              </button>
-            </div>
+            <p className="text-gray-400">by {user?.displayName}</p>
+            {metadata.description && (
+              <p className="mt-4 text-gray-300">{metadata.description}</p>
+            )}
           </div>
 
-          {/* Recipe Details */}
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Ingredients
-              </h2>
-              <ul className="space-y-2 text-gray-300">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span>
-                      {ingredient.amount} {ingredient.unit} {ingredient.name}
-                      {ingredient.notes && (
-                        <span className="text-gray-400">
-                          {" "}
-                          ({ingredient.notes})
-                        </span>
-                      )}
+          {/* Recipe Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Left Column - Basic Info */}
+            <div className="space-y-6">
+              {/* Basic Details */}
+              <div className="bg-gray-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Recipe Details
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-gray-400">Difficulty:</span>
+                    <span className="ml-2 text-white">
+                      {metadata.difficulty}
                     </span>
-                  </li>
-                ))}
-              </ul>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Total Time:</span>
+                    <span className="ml-2 text-white">
+                      {formatDuration(metadata.totalTime)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Prep Time:</span>
+                    <span className="ml-2 text-white">
+                      {formatDuration(metadata.prepTime)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Cook Time:</span>
+                    <span className="ml-2 text-white">
+                      {formatDuration(metadata.cookTime)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400">Servings:</span>
+                    <span className="ml-2 text-white">{metadata.servings}</span>
+                  </div>
+                  {metadata.cuisine && (
+                    <div>
+                      <span className="text-gray-400">Cuisine:</span>
+                      <span className="ml-2 text-white">
+                        {metadata.cuisine}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Nutrition Info */}
+              <div className="bg-gray-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Nutrition Information
+                </h2>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Servings</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.servings}
+                    </div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Calories</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.calories}
+                    </div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Protein</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.protein}g
+                    </div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Carbs</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.carbs}g
+                    </div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Fat</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.fat}g
+                    </div>
+                  </div>
+                  <div className="text-center p-3 bg-gray-700 rounded-lg">
+                    <div className="text-sm text-gray-400">Fiber</div>
+                    <div className="text-lg font-medium text-white">
+                      {metadata.fiber}g
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Equipment */}
+              {metadata.equipmentNeeded.length > 0 && (
+                <div className="bg-gray-800 rounded-lg p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4">
+                    Equipment Needed
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {metadata.equipmentNeeded.map((equipment, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-gray-700 rounded-full text-sm text-white"
+                      >
+                        {equipment}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-4">
-                Instructions
-              </h2>
-              <ol className="space-y-4 text-gray-300">
-                {recipe.instructions.map((instruction, index) => (
-                  <li key={index} className="flex">
-                    <span className="font-semibold mr-4">{index + 1}.</span>
-                    <span>{instruction.description}</span>
-                  </li>
-                ))}
-              </ol>
+            {/* Right Column - Ingredients & Instructions */}
+            <div className="space-y-6">
+              {/* Ingredients */}
+              <div className="bg-gray-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Ingredients
+                </h2>
+                <ul className="space-y-2">
+                  {metadata.ingredients.map((ingredient, index) => (
+                    <li key={index} className="flex items-start text-gray-300">
+                      <span className="mr-2">•</span>
+                      <span>
+                        {ingredient.amount && (
+                          <span className="font-medium">
+                            {ingredient.amount}{" "}
+                          </span>
+                        )}
+                        {ingredient.unit && (
+                          <span className="text-gray-400">
+                            {ingredient.unit}{" "}
+                          </span>
+                        )}
+                        {ingredient.name}
+                        {ingredient.notes && (
+                          <span className="text-gray-500 ml-1">
+                            ({ingredient.notes})
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-gray-800 rounded-lg p-6">
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Instructions
+                </h2>
+                <ol className="space-y-4">
+                  {metadata.instructions.map((instruction, index) => (
+                    <li key={index} className="flex items-start text-gray-300">
+                      <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-gray-700 rounded-full mr-3 text-sm font-medium">
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <p>{instruction.description}</p>
+                        {instruction.notes && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            Note: {instruction.notes}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* Cost Estimation */}
+              {metadata.estimatedCost && (
+                <div className="bg-gray-800 rounded-lg p-6">
+                  <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                    <ScaleIcon className="h-6 w-6 mr-2" />
+                    Estimated Cost
+                  </h2>
+                  <div className="text-gray-300">
+                    <span className="text-lg">
+                      ${(metadata.estimatedCost.min / 100).toFixed(2)} - $
+                      {(metadata.estimatedCost.max / 100).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Nutrition Information */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-white mb-4">
-              Nutrition Information
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Servings</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.servings}
+          {/* Tags and Techniques */}
+          <div className="space-y-6">
+            {/* Techniques */}
+            {metadata.detectedTechniques.length > 0 && (
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-4">
+                  Cooking Techniques
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {metadata.detectedTechniques.map((technique, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-primary-900/50 rounded-full text-sm text-primary-200"
+                    >
+                      {technique}
+                    </span>
+                  ))}
                 </div>
               </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Calories</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.calories}
-                </div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Protein</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.protein}g
-                </div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Carbs</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.carbs}g
-                </div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Fat</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.fat}g
-                </div>
-              </div>
-              <div className="bg-gray-800 p-4 rounded-lg">
-                <div className="text-sm text-gray-400">Fiber</div>
-                <div className="text-xl text-white">
-                  {recipe.nutrition.fiber}g
-                </div>
-              </div>
-            </div>
-          </div>
+            )}
 
-          {/* Tags */}
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Tags</h2>
-            <div className="flex flex-wrap gap-2">
-              {recipe.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+            {/* Tags */}
+            {metadata.tags.length > 0 && (
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-4">Tags</h2>
+                <div className="flex flex-wrap gap-2">
+                  {metadata.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 bg-gray-700 rounded-full text-sm text-gray-300"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

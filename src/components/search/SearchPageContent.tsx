@@ -125,7 +125,7 @@ export default function SearchPageContent() {
 
       {/* Logo and Search Bar */}
       <div className="fixed top-0 left-0 right-0 bg-gray-800/95 backdrop-blur-sm z-40 px-4 py-3">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-md mx-auto">
           <Logo className="mb-3" />
           <input
             type="text"
@@ -145,7 +145,7 @@ export default function SearchPageContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 pt-32 pb-8">
+      <div className="max-w-md mx-auto px-4 pt-32 pb-8">
         {loading ? (
           <div className="text-center">Loading videos...</div>
         ) : error ? (
@@ -157,7 +157,7 @@ export default function SearchPageContent() {
               : "Start typing to search for videos."}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {videos.map((video) => (
               <VideoCard
                 key={video.id}

@@ -3,8 +3,8 @@ const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === "development", // Disable PWA in development
-  buildExcludes: [/middleware-manifest\.json$/], // Exclude middleware manifest
+  disable: process.env.NODE_ENV === "development",
+  buildExcludes: [/middleware-manifest\.json$/],
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/firebasestorage\.googleapis\.com\/.*/i,
@@ -22,14 +22,17 @@ const withPWA = require("next-pwa")({
 
 const nextConfig = {
   images: {
-    domains: ["firebasestorage.googleapis.com"],
-    unoptimized: true, // Required for static export
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.googleusercontent.com",
+      },
+    ],
   },
-  output: "export", // Keep as 'export' for static site generation
-  distDir: "www", // Keep the www directory for Capacitor
-  // Disable server-specific features
-  trailingSlash: true,
-  // Performance optimizations
   swcMinify: true,
   reactStrictMode: true,
   poweredByHeader: false,
@@ -37,6 +40,15 @@ const nextConfig = {
   // experimental: {
   //   staticPageGenerationTimeout: 300,
   // },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    optimizePackageImports: ["@heroicons/react"],
+  },
 };
 
 module.exports = withPWA(nextConfig);

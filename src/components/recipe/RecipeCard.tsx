@@ -2,18 +2,20 @@
 
 import { FirestoreVideo } from "@/lib/firebase/firestore-schema";
 import { formatDuration } from "@/lib/utils/format";
+import { processVideoMetadata } from "@/lib/video-data";
 import {
   ClockIcon,
-  HeartIcon,
   InformationCircleIcon,
+  ScaleIcon,
+  UserIcon,
 } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 interface RecipeCardProps {
   recipe: FirestoreVideo;
   onLike?: () => void;
+  href: string;
 }
 
 export interface RecipeInfoModalProps {
@@ -22,20 +24,15 @@ export interface RecipeInfoModalProps {
   onClose: () => void;
 }
 
-export function RecipeInfoModal({
+// Split into a separate client component
+const RecipeInfoModalContent = ({
   recipe,
   isOpen,
   onClose,
-}: RecipeInfoModalProps) {
+}: RecipeInfoModalProps) => {
   if (!isOpen) return null;
 
-  const analysis = recipe.analysis || {};
-  const {
-    ingredients = [],
-    instructions = [],
-    nutrition = {},
-    aiMetadata = {},
-  } = analysis;
+  const metadata = processVideoMetadata(recipe);
 
   return (
     <div
@@ -64,7 +61,7 @@ export function RecipeInfoModal({
                   className="text-lg leading-6 font-medium text-white"
                   id="modal-title"
                 >
-                  {recipe.title}
+                  {metadata.title}
                 </h3>
                 <div className="mt-4 space-y-4">
                   {/* AI Metadata */}
@@ -73,25 +70,25 @@ export function RecipeInfoModal({
                       <div>
                         <span className="text-gray-400">Skill Level:</span>
                         <span className="ml-2 text-white">
-                          {aiMetadata.skillLevel}
+                          {metadata.difficulty}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-400">Total Time:</span>
                         <span className="ml-2 text-white">
-                          {aiMetadata.totalTime} min
+                          {metadata.totalTime} min
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-400">Prep Time:</span>
                         <span className="ml-2 text-white">
-                          {aiMetadata.prepTime} min
+                          {metadata.prepTime} min
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-400">Cook Time:</span>
                         <span className="ml-2 text-white">
-                          {aiMetadata.cookTime} min
+                          {metadata.cookTime} min
                         </span>
                       </div>
                     </div>
@@ -103,7 +100,7 @@ export function RecipeInfoModal({
                       Equipment Needed
                     </h4>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      {aiMetadata.equipmentNeeded?.map((equipment, index) => (
+                      {metadata.equipmentNeeded?.map((equipment, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300"
@@ -120,7 +117,7 @@ export function RecipeInfoModal({
                       Ingredients
                     </h4>
                     <ul className="mt-2 space-y-2">
-                      {ingredients.map((ingredient, index) => (
+                      {metadata.ingredients.map((ingredient, index) => (
                         <li key={index} className="text-sm text-gray-400">
                           • {ingredient.amount} {ingredient.unit}{" "}
                           {ingredient.name}
@@ -128,11 +125,6 @@ export function RecipeInfoModal({
                             <span className="text-gray-500">
                               {" "}
                               ({ingredient.notes})
-                            </span>
-                          )}
-                          {ingredient.estimatedPrice && (
-                            <span className="text-gray-500 ml-2">
-                              (~${(ingredient.estimatedPrice / 100).toFixed(2)})
                             </span>
                           )}
                         </li>
@@ -146,12 +138,12 @@ export function RecipeInfoModal({
                       Instructions
                     </h4>
                     <ol className="mt-2 space-y-2">
-                      {instructions.map((instruction, index) => (
+                      {metadata.instructions.map((instruction, index) => (
                         <li key={index} className="text-sm text-gray-400">
                           {index + 1}. {instruction.description}
-                          {instruction.duration && (
+                          {instruction.notes && (
                             <span className="text-gray-500 ml-2">
-                              ({instruction.duration}s)
+                              ({instruction.notes})
                             </span>
                           )}
                         </li>
@@ -168,37 +160,37 @@ export function RecipeInfoModal({
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Calories</div>
                         <div className="text-sm text-white">
-                          {nutrition.calories}
+                          {metadata.calories}
                         </div>
                       </div>
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Protein</div>
                         <div className="text-sm text-white">
-                          {nutrition.protein}g
+                          {metadata.protein}g
                         </div>
                       </div>
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Carbs</div>
                         <div className="text-sm text-white">
-                          {nutrition.carbs}g
+                          {metadata.carbs}g
                         </div>
                       </div>
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Fat</div>
                         <div className="text-sm text-white">
-                          {nutrition.fat}g
+                          {metadata.fat}g
                         </div>
                       </div>
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Fiber</div>
                         <div className="text-sm text-white">
-                          {nutrition.fiber}g
+                          {metadata.fiber}g
                         </div>
                       </div>
                       <div className="text-center p-2 bg-gray-700 rounded">
                         <div className="text-xs text-gray-400">Servings</div>
                         <div className="text-sm text-white">
-                          {nutrition.servings}
+                          {metadata.servings}
                         </div>
                       </div>
                     </div>
@@ -210,17 +202,15 @@ export function RecipeInfoModal({
                       Techniques & Tags
                     </h4>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      {aiMetadata.detectedTechniques?.map(
-                        (technique, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-primary-900/50 rounded-full text-xs text-primary-200"
-                          >
-                            {technique}
-                          </span>
-                        )
-                      )}
-                      {aiMetadata.suggestedHashtags?.map((tag, index) => (
+                      {metadata.detectedTechniques?.map((technique, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-primary-900/50 rounded-full text-xs text-primary-200"
+                        >
+                          {technique}
+                        </span>
+                      ))}
+                      {metadata.suggestedHashtags?.map((tag, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300"
@@ -232,12 +222,12 @@ export function RecipeInfoModal({
                   </div>
 
                   {/* Estimated Cost */}
-                  {aiMetadata.estimatedCost && (
+                  {metadata.estimatedCost && (
                     <div className="mt-4 text-sm">
                       <span className="text-gray-400">Estimated Cost: </span>
                       <span className="text-white">
-                        ${(aiMetadata.estimatedCost.min / 100).toFixed(2)} - $
-                        {(aiMetadata.estimatedCost.max / 100).toFixed(2)}
+                        ${(metadata.estimatedCost.min / 100).toFixed(2)} - $
+                        {(metadata.estimatedCost.max / 100).toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -258,124 +248,86 @@ export function RecipeInfoModal({
       </div>
     </div>
   );
+};
+
+// Main component
+export function RecipeInfoModal(props: RecipeInfoModalProps) {
+  return <RecipeInfoModalContent {...props} />;
 }
 
-export function RecipeCard({ recipe, onLike }: RecipeCardProps) {
+export function RecipeCard({ recipe, onLike, href }: RecipeCardProps) {
   const [showInfo, setShowInfo] = useState(false);
-  const isProcessing = recipe.status === "processing";
-  const hasFailed = recipe.status === "failed";
-  const analysis = recipe.analysis || {};
-  const { aiMetadata = {} } = analysis;
+  const metadata = processVideoMetadata(recipe);
 
   return (
     <div className="relative">
-      <Link href={`/recipe/${recipe.id}`}>
-        <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:ring-2 hover:ring-primary-500 transition-all">
-          {/* Thumbnail */}
-          <div className="relative aspect-video">
-            {recipe.thumbnailUrl ? (
-              <Image
-                src={recipe.thumbnailUrl}
-                alt={recipe.title}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
-                <div className="text-gray-400 text-center p-4">
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2" />
-                      <p>Processing recipe...</p>
-                    </>
-                  ) : hasFailed ? (
-                    <>
-                      <p className="text-red-500 mb-2">Processing failed</p>
-                      <p className="text-sm">{recipe.error}</p>
-                    </>
-                  ) : (
-                    "Thumbnail not available"
-                  )}
-                </div>
+      <Link
+        href={href}
+        className="block bg-gray-800 rounded-lg overflow-hidden hover:ring-2 hover:ring-primary-500 transition-all"
+      >
+        {/* Thumbnail */}
+        <div className="relative aspect-video">
+          <img
+            src={metadata.thumbnailUrl}
+            alt={metadata.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+          {/* Duration */}
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded text-white text-sm">
+            {formatDuration(metadata.totalTime)}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 space-y-4">
+          {/* Title and Basic Info */}
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-1">
+              {metadata.title}
+            </h3>
+            <p className="text-sm text-gray-400 line-clamp-2">
+              {metadata.description}
+            </p>
+          </div>
+
+          {/* Recipe Details */}
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            {/* Difficulty */}
+            <div className="flex items-center text-gray-300">
+              <UserIcon className="h-4 w-4 mr-2" />
+              <span>{metadata.difficulty}</span>
+            </div>
+
+            {/* Time */}
+            <div className="flex items-center text-gray-300">
+              <ClockIcon className="h-4 w-4 mr-2" />
+              <span>{metadata.totalTime} min</span>
+            </div>
+
+            {/* Cost */}
+            {metadata.estimatedCost && (
+              <div className="flex items-center text-gray-300">
+                <ScaleIcon className="h-4 w-4 mr-2" />
+                <span>
+                  ${(metadata.estimatedCost.min / 100).toFixed(2)} - $
+                  {(metadata.estimatedCost.max / 100).toFixed(2)}
+                </span>
               </div>
             )}
           </div>
 
-          {/* Content */}
-          <div className="p-4">
-            <h3 className="text-lg font-semibold text-white mb-2">
-              {recipe.title || "Processing recipe..."}
-            </h3>
-
-            <p className="text-gray-400 text-sm mb-4 line-clamp-2">
-              {recipe.description || "Analyzing recipe content..."}
-            </p>
-
-            {/* Recipe Details */}
-            {!isProcessing && !hasFailed && (
-              <div className="space-y-3">
-                {/* Time and Difficulty */}
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center text-gray-300">
-                    <ClockIcon className="h-4 w-4 mr-1" />
-                    <span>
-                      {aiMetadata.totalTime
-                        ? `${aiMetadata.totalTime} min`
-                        : formatDuration(recipe.cookingTime)}
-                    </span>
-                  </div>
-                  <span className="px-2 py-1 rounded-full bg-gray-700 text-xs text-gray-300">
-                    {aiMetadata.skillLevel || recipe.difficulty}
-                  </span>
-                </div>
-
-                {/* Cuisine and Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {recipe.cuisine && (
-                    <span className="px-2 py-1 rounded-full bg-primary-900/50 text-primary-200 text-xs">
-                      {recipe.cuisine}
-                    </span>
-                  )}
-                  {aiMetadata.suggestedHashtags
-                    ?.slice(0, 2)
-                    .map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 rounded-full bg-gray-700 text-gray-300 text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                </div>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-sm text-gray-400">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onLike?.();
-                    }}
-                    className="flex items-center space-x-1 hover:text-primary-400 transition-colors"
-                  >
-                    <HeartIcon className="h-4 w-4" />
-                    <span>{recipe.likes}</span>
-                  </button>
-                  <span>{recipe.views} views</span>
-                </div>
-              </div>
-            )}
-
-            {/* Processing Indicator */}
-            {isProcessing && (
-              <div className="mt-2">
-                <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary-500 rounded-full w-1/3 animate-[progress_1s_ease-in-out_infinite]" />
-                </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  Analyzing recipe details...
-                </p>
-              </div>
-            )}
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {metadata.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-1 bg-gray-700 rounded-full text-xs text-gray-300"
+              >
+                #{tag}
+              </span>
+            ))}
           </div>
         </div>
       </Link>

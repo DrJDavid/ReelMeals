@@ -8,6 +8,15 @@ interface SwipeableViewProps {
   onSwipeRight?: () => void;
 }
 
+interface Emoji {
+  id: number;
+  emoji: string;
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
+}
+
 export default function SwipeableView({
   children,
   onSwipeLeft,
@@ -22,9 +31,76 @@ export default function SwipeableView({
   const [exitDirection, setExitDirection] = useState<"left" | "right" | null>(
     null
   );
+  const [emojis, setEmojis] = useState<Emoji[]>([]);
 
   // Minimum swipe distance to trigger action (in pixels)
   const minSwipeDistance = 100;
+
+  // Create emoji burst effect
+  const createEmojiBurst = (direction: "left" | "right") => {
+    const newEmojis: Emoji[] = [];
+    const videoPlayer = containerRef.current?.querySelector("video");
+    if (!videoPlayer) return;
+
+    const videoRect = videoPlayer.getBoundingClientRect();
+    const count = 15; // Number of emojis
+
+    // Calculate the bounds for the respective side
+    const sideWidth = videoRect.width / 2;
+    const startX =
+      direction === "left" ? videoRect.left : videoRect.left + sideWidth;
+    const maxDistance = sideWidth * 0.3; // 30% of half width for better spread
+
+    for (let i = 0; i < count; i++) {
+      // Create a spread pattern that stays within the respective half
+      const angle = (Math.random() * Math.PI - Math.PI / 2) * 0.8; // Spread in a 144-degree arc
+      const distance = 20 + Math.random() * maxDistance;
+
+      // Calculate base position
+      const x =
+        startX +
+        (direction === "left"
+          ? distance * Math.cos(angle)
+          : sideWidth - distance * Math.cos(angle));
+      const y = videoRect.top + videoRect.height * (0.3 + Math.random() * 0.4); // Keep in middle 40% vertically
+
+      // Ensure emojis stay within their colored areas
+      const clampedX = Math.max(
+        direction === "left"
+          ? videoRect.left + 20
+          : videoRect.left + sideWidth + 20,
+        Math.min(
+          direction === "left"
+            ? videoRect.left + sideWidth - 20
+            : videoRect.right - 20,
+          x
+        )
+      );
+      const clampedY = Math.max(
+        videoRect.top + 20,
+        Math.min(videoRect.bottom - 20, y)
+      );
+
+      const rotation = Math.random() * 180 - 90; // -90 to 90 degrees
+      const scale = 1.2 + Math.random() * 0.6; // 1.2 to 1.8
+
+      newEmojis.push({
+        id: Date.now() + i,
+        emoji: direction === "right" ? "👨‍🍳" : "🥡",
+        x: clampedX,
+        y: clampedY,
+        rotation,
+        scale,
+      });
+    }
+
+    setEmojis(newEmojis);
+
+    // Clear emojis after animation
+    setTimeout(() => {
+      setEmojis([]);
+    }, 1500);
+  };
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     // Don't start swipe if we're scrubbing the video
@@ -32,9 +108,11 @@ export default function SwipeableView({
     const videoPlayer = target.closest('[data-scrubbing="true"]');
     if (videoPlayer) return;
 
-    // Also check if the click/touch is on the video controls
+    // Also check if the click/touch is on the video controls or video element
     const controls = target.closest(".video-controls");
-    if (controls) return;
+    const video = target.closest("video");
+    const playPauseOverlay = target.closest(".play-pause-overlay");
+    if (controls || video || playPauseOverlay) return;
 
     if (isExiting) return;
     setIsDragging(true);
@@ -46,10 +124,12 @@ export default function SwipeableView({
   const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
     if (!isDragging || isExiting) return;
 
-    // Don't swipe if we're scrubbing
+    // Don't swipe if we're interacting with video
     const target = e.target as HTMLElement;
     const videoPlayer = target.closest('[data-scrubbing="true"]');
-    if (videoPlayer) {
+    const video = target.closest("video");
+    const playPauseOverlay = target.closest(".play-pause-overlay");
+    if (videoPlayer || video || playPauseOverlay) {
       handleTouchEnd();
       return;
     }
@@ -77,6 +157,9 @@ export default function SwipeableView({
       // Set final translation
       const screenWidth = window.innerWidth;
       setTranslateX(isLeftSwipe ? -screenWidth : screenWidth);
+
+      // Create emoji burst effect
+      createEmojiBurst(isLeftSwipe ? "left" : "right");
 
       // Call the appropriate handler after animation
       setTimeout(() => {
@@ -167,6 +250,49 @@ export default function SwipeableView({
           }}
         />
       </div>
+
+      {/* Emoji Animation Layer */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {emojis.map((emoji) => (
+          <div
+            key={emoji.id}
+            className="absolute transition-all duration-1500"
+            style={{
+              left: emoji.x,
+              top: emoji.y,
+              transform: `rotate(${emoji.rotation}deg) scale(${emoji.scale})`,
+              opacity: 0,
+              animation: "emoji-burst 1.5s ease-out forwards",
+              fontSize: "1.75rem", // Slightly smaller base font size
+            }}
+          >
+            {emoji.emoji}
+          </div>
+        ))}
+      </div>
+
+      {/* Add keyframes for emoji animation */}
+      <style jsx global>{`
+        @keyframes emoji-burst {
+          0% {
+            opacity: 0;
+            transform: rotate(0deg) scale(0);
+          }
+          20% {
+            opacity: 1;
+            transform: rotate(${Math.random() * 90 - 45}deg) scale(1);
+          }
+          80% {
+            opacity: 1;
+            transform: rotate(${Math.random() * 90 - 45}deg)
+              scale(${1.2 + Math.random() * 0.3});
+          }
+          100% {
+            opacity: 0;
+            transform: rotate(${Math.random() * 90 - 45}deg) scale(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

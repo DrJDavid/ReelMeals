@@ -9,7 +9,7 @@ export default function UploadPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-900 text-white pb-20">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto px-4 py-8">
           {/* Header */}
           <div className="mb-8">
             <Logo className="mb-4" />

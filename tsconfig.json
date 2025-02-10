@@ -8,7 +8,7 @@
     "disableSourceOfProjectReferenceRedirect": true /* Disable preferring source files instead of declaration files when referencing composite projects. */,
     "disableSolutionSearching": true /* Opt a project out of multi-project reference checking when editing. */,
     "disableReferencedProjectLoad": true /* Reduce the number of projects loaded automatically by TypeScript. */ /* Language and Environment */,
-    "target": "es5",
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,8 +16,8 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -110,7 +110,8 @@
     "**/*.ts",
     "**/*.tsx",
     "www/types/**/*.ts",
-    "scripts/**/*.ts"
+    "scripts/**/*.ts",
+    "build/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

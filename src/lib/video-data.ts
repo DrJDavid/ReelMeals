@@ -1,271 +1,206 @@
 import { FirestoreVideo } from "./firebase/firestore-schema";
 
-export interface VideoMetadata extends Omit<FirestoreVideo, "id"> {
-  id?: string;
-  videoUrl: string;
-  thumbnailUrl?: string;
+export interface ProcessedVideoMetadata {
+  id: string;
   title: string;
   description: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  status:
+    | "processing"
+    | "ready"
+    | "failed"
+    | "draft"
+    | "published"
+    | "archived";
+  error?: string;
+
+  // Basic metadata
+  difficulty: string;
+  totalTime: number;
+  prepTime: number;
+  cookTime: number;
+  cuisine: string;
+
+  // Recipe details
+  ingredients: Array<{
+    name: string;
+    amount: number;
+    unit: string;
+    notes?: string;
+  }>;
+  instructions: Array<{
+    description: string;
+    notes?: string;
+  }>;
+
+  // Equipment and techniques
+  equipmentNeeded: string[];
+  detectedTechniques: string[];
+
+  // Nutrition info
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  servings: number;
+
+  // Cost estimation
+  estimatedCost?: {
+    min: number;
+    max: number;
+  };
+
+  // Social metrics
   likes: number;
   views: number;
-  status?: string;
-  error?: string;
-  analysis?: {
-    ingredients: Array<{
-      name: string;
-      amount: number;
-      unit: string;
-      estimatedPrice?: number;
-      notes?: string;
-    }>;
-    instructions: Array<{
-      step: number;
-      description: string;
-      timestamp?: number;
-      duration?: number;
-    }>;
-    nutrition: {
-      servings: number;
-      calories: number;
-      protein: number;
-      carbs: number;
-      fat: number;
-      fiber: number;
+
+  // Tags and categories
+  tags: string[];
+  suggestedHashtags: string[];
+}
+
+/**
+ * Helper function to deduplicate arrays
+ */
+function dedupeArray<T>(arr: T[]): T[] {
+  return Array.from(new Set(arr));
+}
+
+interface VideoAnalysis {
+  aiMetadata?: {
+    skillLevel?: string;
+    totalTime?: number;
+    prepTime?: number;
+    cookTime?: number;
+    cuisine?: string;
+    detectedTechniques?: string[];
+    suggestedHashtags?: string[];
+    equipmentNeeded?: string[];
+    estimatedCost?: {
+      min: number;
+      max: number;
     };
-    aiMetadata: {
-      detectedIngredients: string[];
-      detectedTechniques: string[];
-      confidenceScore: number;
-      suggestedHashtags: string[];
-      equipmentNeeded: string[];
-      skillLevel: string;
-      totalTime: number;
-      prepTime: number;
-      cookTime: number;
-      estimatedCost: {
-        min: number;
-        max: number;
-        currency: string;
-      };
-    };
+  };
+  nutrition?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fiber?: number;
+    servings?: number;
+  };
+  ingredients?: Array<{
+    name: string;
+    amount: number;
+    unit: string;
+    notes?: string;
+  }>;
+  instructions?: Array<{
+    description: string;
+    notes?: string;
+  }>;
+}
+
+/**
+ * Processes a FirestoreVideo to provide a consistent interface for components.
+ * Merges base video data with AI metadata, providing defaults where needed.
+ */
+export function processVideoMetadata(
+  video: FirestoreVideo
+): ProcessedVideoMetadata {
+  const analysis = (video.analysis || {}) as VideoAnalysis;
+  const aiMetadata = analysis.aiMetadata || {};
+  const nutrition = analysis.nutrition || {};
+
+  return {
+    id: video.id,
+    title: video.title || "Untitled Recipe",
+    description: video.description || "No description available",
+    thumbnailUrl: video.thumbnailUrl || "",
+    videoUrl: video.videoUrl || "",
+    status: video.status || "processing",
+    error: video.error,
+
+    // Basic metadata
+    difficulty: aiMetadata.skillLevel || video.difficulty || "Beginner",
+    totalTime: aiMetadata.totalTime || video.cookingTime || 0,
+    prepTime: aiMetadata.prepTime || 0,
+    cookTime: aiMetadata.cookTime || video.cookingTime || 0,
+    cuisine: aiMetadata.cuisine || video.cuisine || "Unknown",
+
+    // Recipe details
+    ingredients: (analysis.ingredients || []).map((ingredient) => ({
+      name: ingredient.name,
+      amount: ingredient.amount || 0,
+      unit: ingredient.unit || "",
+      notes: ingredient.notes,
+    })),
+    instructions: (analysis.instructions || []).map((instruction) => ({
+      description: instruction.description,
+      notes: instruction.notes,
+    })),
+
+    // Equipment and techniques
+    equipmentNeeded: aiMetadata.equipmentNeeded || [],
+    detectedTechniques: aiMetadata.detectedTechniques || [],
+
+    // Nutrition info
+    calories: nutrition.calories || 0,
+    protein: nutrition.protein || 0,
+    carbs: nutrition.carbs || 0,
+    fat: nutrition.fat || 0,
+    fiber: nutrition.fiber || 0,
+    servings: nutrition.servings || 1,
+
+    // Cost estimation
+    estimatedCost: aiMetadata.estimatedCost,
+
+    // Social metrics
+    likes: video.likes || 0,
+    views: video.views || 0,
+
+    // Tags and categories
+    tags: dedupeArray([
+      ...(video.tags || []),
+      ...(aiMetadata.suggestedHashtags || []),
+    ]),
+    suggestedHashtags: aiMetadata.suggestedHashtags || [],
   };
 }
 
-// Mock data for our test videos
-export const TEST_VIDEOS: VideoMetadata[] = [
+// Test data for development
+export const TEST_VIDEOS: FirestoreVideo[] = [
   {
     id: "1",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    title: "Classic Italian Pasta Carbonara",
+    videoUrl: "https://example.com/video1.mp4",
+    thumbnailUrl: "https://example.com/thumb1.jpg",
+    title: "Carbonara",
+    description: "Classic Roman pasta dish",
     cuisine: "Italian",
-    cookingTime: 25,
     difficulty: "Medium",
-    thumbnailUrl: "https://picsum.photos/seed/pasta1/400/600",
-    chef: "Marco Rossi",
-    description:
-      "Learn how to make authentic Italian carbonara with just eggs, cheese, and guanciale.",
-    ingredients: [
-      "Spaghetti",
-      "Eggs",
-      "Pecorino Romano",
-      "Guanciale",
-      "Black Pepper",
-    ],
-    tags: ["pasta", "italian", "classic", "creamy"],
-    likes: 1243,
-    views: 5420,
-  },
-  {
-    id: "2",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    title: "Spicy Thai Green Curry",
-    cuisine: "Thai",
-    cookingTime: 35,
-    difficulty: "Medium",
-    thumbnailUrl: "https://picsum.photos/seed/curry2/400/600",
-    chef: "Siri Patel",
-    description:
-      "A fragrant and creamy Thai green curry packed with vegetables and chicken.",
-    ingredients: [
-      "Coconut Milk",
-      "Green Curry Paste",
-      "Chicken",
-      "Thai Basil",
-      "Bamboo Shoots",
-    ],
-    tags: ["curry", "thai", "spicy", "coconut"],
-    likes: 892,
-    views: 3150,
-  },
-  {
-    id: "3",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-    title: "Quick Japanese Ramen",
-    cuisine: "Japanese",
-    cookingTime: 45,
-    difficulty: "Hard",
-    thumbnailUrl: "https://picsum.photos/seed/ramen3/400/600",
-    chef: "Kenji Tanaka",
-    description:
-      "Master the art of making authentic Japanese ramen with rich tonkotsu broth.",
-    ingredients: [
-      "Ramen Noodles",
-      "Pork Belly",
-      "Soy Sauce",
-      "Mirin",
-      "Green Onions",
-    ],
-    tags: ["ramen", "japanese", "soup", "umami"],
-    likes: 1567,
-    views: 6890,
-  },
-  {
-    id: "4",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    title: "Mexican Street Tacos",
-    cuisine: "Mexican",
     cookingTime: 30,
-    difficulty: "Easy",
-    thumbnailUrl: "https://picsum.photos/seed/tacos4/400/600",
-    chef: "Maria Garcia",
-    description:
-      "Authentic Mexican street tacos with marinated carne asada and fresh salsa.",
-    ingredients: ["Corn Tortillas", "Carne Asada", "Onion", "Cilantro", "Lime"],
-    tags: ["tacos", "mexican", "street food", "spicy"],
-    likes: 2103,
-    views: 8940,
-  },
-  {
-    id: "5",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    title: "French Coq au Vin",
-    cuisine: "French",
-    cookingTime: 90,
-    difficulty: "Hard",
-    thumbnailUrl: "https://picsum.photos/seed/coq5/400/600",
-    chef: "Pierre Dubois",
-    description:
-      "Classic French chicken braised in wine with mushrooms and pearl onions.",
+    likes: 1200,
+    views: 5000,
+    status: "ready",
+    uploadedByUserId: "user1",
+    userId: "user1",
+    createdAt: { seconds: 0, nanoseconds: 0 },
+    techniques: ["boiling", "mixing", "emulsifying"],
+    tags: ["pasta", "italian", "classic"],
     ingredients: [
-      "Chicken",
-      "Red Wine",
-      "Mushrooms",
-      "Pearl Onions",
-      "Bacon Lardons",
+      { name: "Spaghetti", amount: 500, unit: "g" },
+      { name: "Eggs", amount: 3, unit: "whole" },
+      { name: "Pecorino Romano", amount: 100, unit: "g" },
+      { name: "Guanciale", amount: 150, unit: "g" },
+      { name: "Black Pepper", amount: 2, unit: "tsp" },
     ],
-    tags: ["french", "braised", "wine", "classic"],
-    likes: 756,
-    views: 2890,
-  },
-  {
-    id: "6",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
-    title: "Indian Butter Chicken",
-    cuisine: "Indian",
-    cookingTime: 50,
-    difficulty: "Medium",
-    thumbnailUrl: "https://picsum.photos/seed/butter6/400/600",
-    chef: "Priya Sharma",
-    description:
-      "Rich and creamy butter chicken with aromatic spices and tender chicken.",
-    ingredients: ["Chicken", "Butter", "Cream", "Tomatoes", "Garam Masala"],
-    tags: ["indian", "curry", "creamy", "spicy"],
-    likes: 1876,
-    views: 7230,
-  },
-  {
-    id: "7",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-    title: "Korean Bibimbap",
-    cuisine: "Korean",
-    cookingTime: 40,
-    difficulty: "Medium",
-    thumbnailUrl: "https://picsum.photos/seed/bibimbap7/400/600",
-    chef: "Min-ji Kim",
-    description:
-      "Colorful and nutritious Korean rice bowl with vegetables and gochujang sauce.",
-    ingredients: ["Rice", "Vegetables", "Beef", "Egg", "Gochujang"],
-    tags: ["korean", "rice bowl", "healthy", "spicy"],
-    likes: 1432,
-    views: 5670,
-  },
-  {
-    id: "8",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    title: "Greek Moussaka",
-    cuisine: "Greek",
-    cookingTime: 75,
-    difficulty: "Hard",
-    thumbnailUrl: "https://picsum.photos/seed/moussaka8/400/600",
-    chef: "Elena Papadopoulos",
-    description:
-      "Traditional Greek moussaka layered with eggplant, meat sauce, and béchamel.",
-    ingredients: [
-      "Eggplant",
-      "Ground Lamb",
-      "Béchamel",
-      "Tomatoes",
-      "Cinnamon",
+    instructions: [
+      { description: "Boil pasta in salted water", duration: 600 },
+      { description: "Crisp guanciale", duration: 300 },
+      { description: "Mix eggs and cheese", duration: 180 },
+      { description: "Combine all ingredients", duration: 120 },
     ],
-    tags: ["greek", "casserole", "comfort food", "baked"],
-    likes: 945,
-    views: 4120,
-  },
-  {
-    id: "9",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-    title: "Vietnamese Pho",
-    cuisine: "Vietnamese",
-    cookingTime: 180,
-    difficulty: "Hard",
-    thumbnailUrl: "https://picsum.photos/seed/pho9/400/600",
-    chef: "Nguyen Van",
-    description:
-      "Traditional Vietnamese beef pho with aromatic broth and fresh herbs.",
-    ingredients: [
-      "Rice Noodles",
-      "Beef",
-      "Bean Sprouts",
-      "Thai Basil",
-      "Star Anise",
-    ],
-    tags: ["vietnamese", "soup", "noodles", "aromatic"],
-    likes: 1654,
-    views: 6780,
-  },
-  {
-    id: "10",
-    videoUrl:
-      "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    title: "Spanish Paella",
-    cuisine: "Spanish",
-    cookingTime: 60,
-    difficulty: "Medium",
-    thumbnailUrl: "https://picsum.photos/seed/paella10/400/600",
-    chef: "Carlos Rodriguez",
-    description:
-      "Authentic Spanish seafood paella with saffron rice and mixed seafood.",
-    ingredients: ["Rice", "Shrimp", "Mussels", "Saffron", "Bell Peppers"],
-    tags: ["spanish", "rice", "seafood", "traditional"],
-    likes: 1234,
-    views: 5430,
   },
 ];
-
-export function mapFirestoreVideoToMetadata(
-  video: FirestoreVideo
-): VideoMetadata {
-  return {
-    ...video,
-    id: video.id,
-  };
-}

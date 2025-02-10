@@ -242,92 +242,112 @@ export function VideoPlayer({
       data-scrubbing={isScrubbing}
     >
       {downloadUrl ? (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover cursor-pointer"
-          src={downloadUrl}
-          playsInline
-          loop={loop}
-          muted={isMuted}
-          autoPlay={autoPlay}
-          onClick={togglePlay}
-          onLoadedMetadata={handleLoadedMetadata}
-          onTimeUpdate={handleTimeUpdate}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={onEnded}
-          onError={(e) => {
-            console.error("Video element error:", e);
-            onError?.(e);
-          }}
-        />
+        <>
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover cursor-pointer"
+            src={downloadUrl}
+            playsInline
+            loop={loop}
+            muted={isMuted}
+            autoPlay={autoPlay}
+            onClick={togglePlay}
+            onLoadedMetadata={handleLoadedMetadata}
+            onTimeUpdate={handleTimeUpdate}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={onEnded}
+            onError={(e) => {
+              console.error("Video element error:", e);
+              onError?.(e);
+            }}
+          />
+
+          {/* Play/Pause Overlay */}
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-200 cursor-pointer play-pause-overlay"
+            style={{
+              opacity: isPlaying ? 0 : 1,
+              pointerEvents: isPlaying ? "none" : "auto",
+            }}
+            onClick={togglePlay}
+          >
+            <div className="bg-black/50 rounded-full p-4 transform transition-transform hover:scale-110">
+              {isPlaying ? (
+                <PauseIcon className="w-12 h-12 text-white" />
+              ) : (
+                <PlayIcon className="w-12 h-12 text-white" />
+              )}
+            </div>
+          </div>
+
+          {/* Video Controls */}
+          <div
+            className={`absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-200 ${
+              showControls || !isPlaying ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {/* Progress bar */}
+            <div
+              ref={progressRef}
+              className="relative h-1.5 w-full bg-white/30 cursor-pointer"
+              onClick={handleProgressClick}
+              onMouseDown={handleProgressMouseDown}
+            >
+              <div
+                className="absolute h-full bg-white shadow-md"
+                style={{ width: `${(currentTime / duration) * 100}%` }}
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-between px-4 py-2 bg-black/50 backdrop-blur-sm">
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={togglePlay}
+                  className="text-white hover:text-gray-200 p-1.5"
+                >
+                  {isPlaying ? (
+                    <PauseIcon className="w-6 h-6" />
+                  ) : (
+                    <PlayIcon className="w-6 h-6" />
+                  )}
+                </button>
+
+                <button
+                  onClick={toggleMute}
+                  className="text-white hover:text-gray-200 p-1.5"
+                >
+                  {isMuted ? (
+                    <SpeakerXMarkIcon className="w-6 h-6" />
+                  ) : (
+                    <SpeakerWaveIcon className="w-6 h-6" />
+                  )}
+                </button>
+
+                <div className="text-white font-medium">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
+              </div>
+
+              <button
+                onClick={toggleFullscreen}
+                className="text-white hover:text-gray-200 p-1.5"
+              >
+                {isFullscreen ? (
+                  <ArrowsPointingInIcon className="w-6 h-6" />
+                ) : (
+                  <ArrowsPointingOutIcon className="w-6 h-6" />
+                )}
+              </button>
+            </div>
+          </div>
+        </>
       ) : (
         <div className="absolute inset-0 flex items-center justify-center text-white">
           Loading video...
         </div>
       )}
-
-      {/* Video Controls */}
-      <div
-        className={`absolute bottom-0 left-0 right-0 z-30 transition-opacity duration-200 ${
-          showControls || !isPlaying ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {/* Progress bar */}
-        <div
-          ref={progressRef}
-          className="relative h-1.5 w-full bg-white/30 cursor-pointer"
-          onClick={handleProgressClick}
-          onMouseDown={handleProgressMouseDown}
-        >
-          <div
-            className="absolute h-full bg-white shadow-md"
-            style={{ width: `${(currentTime / duration) * 100}%` }}
-          />
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center justify-between px-4 py-2 bg-black/50 backdrop-blur-sm">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={togglePlay}
-              className="text-white hover:text-gray-200 p-1.5"
-            >
-              {isPlaying ? (
-                <PauseIcon className="w-6 h-6" />
-              ) : (
-                <PlayIcon className="w-6 h-6" />
-              )}
-            </button>
-
-            <button
-              onClick={toggleMute}
-              className="text-white hover:text-gray-200 p-1.5"
-            >
-              {isMuted ? (
-                <SpeakerXMarkIcon className="w-6 h-6" />
-              ) : (
-                <SpeakerWaveIcon className="w-6 h-6" />
-              )}
-            </button>
-
-            <div className="text-white font-medium">
-              {formatTime(currentTime)} / {formatTime(duration)}
-            </div>
-          </div>
-
-          <button
-            onClick={toggleFullscreen}
-            className="text-white hover:text-gray-200 p-1.5"
-          >
-            {isFullscreen ? (
-              <ArrowsPointingInIcon className="w-6 h-6" />
-            ) : (
-              <ArrowsPointingOutIcon className="w-6 h-6" />
-            )}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

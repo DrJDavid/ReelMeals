@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import cors from "cors";
 import { initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 import { defineString } from "firebase-functions/params";
@@ -14,13 +14,36 @@ initializeApp();
 
 const db = getFirestore();
 const storage = getStorage();
+const auth = getAuth();
 
-// Initialize CORS middleware
-const corsHandler = cors({
-  origin: true,
-  credentials: true,
+// Initialize CORS middleware with specific origins
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (error: Error | null, allow?: boolean) => void
+  ) {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://reelmeals-63cc4.web.app",
+      "https://reelmeals-63cc4.firebaseapp.com",
+    ];
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith(".web.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["POST", "OPTIONS"],
-});
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  maxAge: 86400, // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
 
 // Initialize Gemini client
 const genAI = new GoogleGenerativeAI(geminiKey.value());
@@ -396,7 +419,40 @@ async function updateCache(videoId: string, analysis: VideoAnalysis) {
   console.log(`Cache updated for video ${videoId}`);
 }
 
-// Update the main function to use caching
+// Add CORS headers helper
+const addCorsHeaders = (req: any, res: any) => {
+  const origin = req.headers.origin;
+
+  // If origin matches our allowed origins, set it
+  if (origin) {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "https://reelmeals-63cc4.web.app",
+      "https://reelmeals-63cc4.firebaseapp.com",
+    ];
+
+    if (allowedOrigins.includes(origin) || origin.endsWith(".web.app")) {
+      res.set("Access-Control-Allow-Origin", origin);
+    }
+  }
+
+  res.set("Access-Control-Allow-Methods", corsOptions.methods.join(", "));
+  res.set(
+    "Access-Control-Allow-Headers",
+    corsOptions.allowedHeaders.join(", ")
+  );
+  res.set("Access-Control-Allow-Credentials", "true");
+  res.set("Access-Control-Max-Age", corsOptions.maxAge.toString());
+
+  // For preflight requests
+  if (req.method === "OPTIONS") {
+    res.set("Vary", "Origin");
+  }
+
+  return res;
+};
+
+// Update the main function to use CORS
 export const analyzeVideo = onRequest(
   {
     region: "us-central1",
@@ -406,11 +462,48 @@ export const analyzeVideo = onRequest(
   },
   async (req, res) => {
     // Handle CORS preflight
-    await new Promise((resolve) => corsHandler(req, res, resolve));
+    if (req.method === "OPTIONS") {
+      addCorsHeaders(req, res);
+      res.status(204).send("");
+      return;
+    }
+
+    // Add CORS headers to all responses
+    addCorsHeaders(req, res);
 
     // Only allow POST requests
     if (req.method !== "POST") {
       res.status(405).json({ error: "Method Not Allowed" });
+      return;
+    }
+
+    // Get authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      res.status(401).json({
+        error: "Unauthorized",
+        details: "Missing or invalid authorization header",
+      });
+      return;
+    }
+
+    // Verify token
+    const token = authHeader.split("Bearer ")[1];
+    try {
+      const decodedToken = await auth.verifyIdToken(token);
+      if (!decodedToken.uid) {
+        res.status(401).json({
+          error: "Unauthorized",
+          details: "Invalid token",
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Token verification error:", error);
+      res.status(401).json({
+        error: "Unauthorized",
+        details: "Token verification failed",
+      });
       return;
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/features/auth/AuthContext";
-import { uploadVideo } from "@/lib/services/video-upload";
+import { uploadVideo, VideoUploadError } from "@/lib/services/video-upload";
 import {
   ArrowUpTrayIcon,
   CheckCircleIcon,
@@ -18,6 +18,8 @@ interface UploadState {
   progress: number;
   message?: string;
   confidence?: number;
+  fileSize?: number;
+  errorCode?: string;
 }
 
 export function VideoUpload() {
@@ -31,28 +33,12 @@ export function VideoUpload() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    // Simple size check (100MB limit)
-    if (file.size > MAX_FILE_SIZE) {
-      setUploadState({
-        status: "error",
-        progress: 0,
-        message: `File size exceeds ${MAX_FILE_SIZE_MB}MB limit`,
-      });
-      return;
-    }
-
-    // Validate file type
-    if (!file.type.startsWith("video/")) {
-      setUploadState({
-        status: "error",
-        progress: 0,
-        message: "Please select a valid video file.",
-      });
-      return;
-    }
-
     // Start upload
-    setUploadState({ status: "uploading", progress: 0 });
+    setUploadState({
+      status: "uploading",
+      progress: 0,
+      fileSize: file.size,
+    });
 
     try {
       const result = await uploadVideo(file, user.uid, (progress) => {
@@ -67,6 +53,7 @@ export function VideoUpload() {
             result.preScreeningResult?.reason ||
             "Video is not a valid cooking video",
           confidence: result.preScreeningResult?.confidence,
+          fileSize: file.size,
         });
         return;
       }
@@ -76,15 +63,52 @@ export function VideoUpload() {
         progress: 100,
         message: "Video uploaded successfully! Processing will begin shortly.",
         confidence: result.preScreeningResult?.confidence,
+        fileSize: file.size,
       });
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadState({
-        status: "error",
-        progress: 0,
-        message:
-          error instanceof Error ? error.message : "Failed to upload video",
-      });
+
+      if (error instanceof VideoUploadError) {
+        const errorMessage = getErrorMessage(error.code);
+        setUploadState({
+          status: "error",
+          progress: 0,
+          message: errorMessage,
+          errorCode: error.code,
+        });
+      } else {
+        setUploadState({
+          status: "error",
+          progress: 0,
+          message:
+            error instanceof Error ? error.message : "Failed to upload video",
+        });
+      }
+    }
+  };
+
+  const getErrorMessage = (code: string): string => {
+    switch (code) {
+      case "NO_FILE":
+        return "Please select a file to upload.";
+      case "NO_USER_ID":
+        return "You must be logged in to upload videos.";
+      case "FILE_TOO_LARGE":
+        return `File size exceeds ${MAX_FILE_SIZE_MB}MB limit.`;
+      case "INVALID_FILE_TYPE":
+        return "Invalid file type. Please upload a valid video file (MP4, MOV, or AVI).";
+      case "FIREBASE_NOT_INITIALIZED":
+        return "Upload service is temporarily unavailable. Please try again later.";
+      case "UPLOAD_CANCELED":
+        return "Upload was canceled.";
+      case "UNAUTHORIZED":
+        return "You are not authorized to upload videos.";
+      case "UPLOAD_FAILED":
+        return "Failed to upload video after multiple attempts. Please try again.";
+      case "DOCUMENT_CREATION_FAILED":
+        return "Failed to save video information. Please try again.";
+      default:
+        return "An unexpected error occurred. Please try again.";
     }
   };
 
@@ -139,7 +163,9 @@ export function VideoUpload() {
                 </div>
                 <p className="text-xs text-primary-400/80">
                   {Math.round(uploadState.progress)}% •{" "}
-                  {(file.size / (1024 * 1024)).toFixed(1)}MB
+                  {uploadState.fileSize &&
+                    (uploadState.fileSize / (1024 * 1024)).toFixed(1)}
+                  MB
                 </p>
               </div>
             ) : uploadState.status === "success" ? (
@@ -152,7 +178,14 @@ export function VideoUpload() {
                 )}
               </div>
             ) : uploadState.status === "error" ? (
-              <p className="text-red-400">{uploadState.message}</p>
+              <div className="space-y-1">
+                <p className="text-red-400">{uploadState.message}</p>
+                {uploadState.errorCode && (
+                  <p className="text-sm text-red-400/80">
+                    Error code: {uploadState.errorCode}
+                  </p>
+                )}
+              </div>
             ) : uploadState.status === "invalid" ? (
               <div className="space-y-1">
                 <p className="text-yellow-400">{uploadState.message}</p>
@@ -187,6 +220,7 @@ export function VideoUpload() {
           <li>• Should show ingredients being used</li>
           <li>• Must demonstrate cooking techniques</li>
           <li>• Maximum file size: {MAX_FILE_SIZE_MB}MB</li>
+          <li>• Supported formats: MP4, MOV, AVI</li>
         </ul>
       </div>
     </div>

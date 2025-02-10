@@ -1,27 +1,18 @@
 "use client";
 
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { NavBar } from "@/components/NavBar";
 import SwipeableView from "@/components/swipe/SwipeableView";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import { useAuth } from "@/features/auth/AuthContext";
 import { useVideoFeed } from "@/hooks/useVideoFeed";
-import { mapFirestoreVideoToMetadata } from "@/lib/video-data";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function FeedPageContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const isGuestMode = searchParams.get("mode") === "guest";
-
-  // Redirect if not authenticated and not in guest mode
-  useEffect(() => {
-    if (!user && !isGuestMode) {
-      router.push("/auth/login");
-    }
-  }, [user, isGuestMode, router]);
 
   const {
     currentVideo,
@@ -45,7 +36,7 @@ export default function FeedPageContent() {
     </div>
   );
 
-  return (
+  const content = (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900">
       {isGuestMode && <GuestBanner />}
 
@@ -69,7 +60,7 @@ export default function FeedPageContent() {
           <>
             <SwipeableView onSwipeLeft={handleSkip} onSwipeRight={handleLike}>
               <SwipeCard
-                video={mapFirestoreVideoToMetadata(currentVideo)}
+                video={currentVideo}
                 onError={(error) => console.error("Video error:", error)}
               />
             </SwipeableView>
@@ -112,4 +103,6 @@ export default function FeedPageContent() {
       <NavBar />
     </main>
   );
+
+  return isGuestMode ? content : <ProtectedRoute>{content}</ProtectedRoute>;
 }

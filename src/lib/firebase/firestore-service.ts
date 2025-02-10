@@ -66,6 +66,22 @@ export async function getVideosByTag(tag: string) {
   );
 }
 
+export async function getVideosByUser(
+  userId: string
+): Promise<FirestoreVideo[]> {
+  if (!db) throw new Error("Firestore not initialized");
+  const videosRef = collection(db, "videos");
+  const q = query(
+    videosRef,
+    where("uploadedByUserId", "==", userId),
+    orderBy("createdAt", "desc")
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as FirestoreVideo)
+  );
+}
+
 // Collection Operations
 export async function getUserCollections(userId: string) {
   if (!db) throw new Error("Firestore not initialized");
@@ -188,13 +204,11 @@ export async function getUser(userId: string) {
 }
 
 export async function createUser(
-  user: Omit<FirestoreUser, "id" | "createdAt" | "updatedAt">
-): Promise<FirestoreUser> {
+  uid: string,
+  userData: Omit<FirestoreUser, "id">
+): Promise<void> {
   if (!db) throw new Error("Firestore not initialized");
-  const usersRef = collection(db, "users");
-  const userWithTimestamps = withTimestamps(user);
-  const docRef = await addDoc(usersRef, userWithTimestamps);
-  return { id: docRef.id, ...userWithTimestamps };
+  await setDoc(doc(db, "users", uid), userData);
 }
 
 export async function updateUser(
@@ -209,4 +223,13 @@ export async function updateUser(
   };
   await updateDoc(userRef, updateData);
   return updateData;
+}
+
+export async function getUserDisplayName(uid: string): Promise<string> {
+  if (!db) throw new Error("Firestore not initialized");
+  const userDoc = await getDoc(doc(db, "users", uid));
+  if (!userDoc.exists()) {
+    return "Unknown User";
+  }
+  return (userDoc.data() as FirestoreUser).displayName || "Unknown User";
 }

@@ -2,58 +2,79 @@ import { Timestamp } from "firebase/firestore";
 
 export interface FirestoreVideo {
   id: string;
-  videoUrl: string;
-  thumbnailUrl: string;
   title: string;
   description: string;
+  thumbnailUrl: string;
+  videoUrl: string;
+  userId: string;
+  uploadedByUserId?: string;
+  createdAt: { seconds: number; nanoseconds: number };
   cuisine: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  cookingTime: number; // in minutes
-  ingredients: Array<{
+  cookingTime: number;
+  tags: string[];
+  techniques?: string[];
+  ingredients?: Array<{
     name: string;
     amount: number;
     unit: string;
-    estimatedPrice?: number; // Price in cents
+    notes?: string;
+    estimatedPrice?: number;
+  }>;
+  instructions?: Array<{
+    description: string;
+    duration?: number;
+    timestamp?: number;
     notes?: string;
   }>;
-  instructions: Array<{
-    step: number;
-    description: string;
-    timestamp?: number; // Video timestamp where this step occurs
-    duration?: number; // Estimated duration of this step
-  }>;
-  nutrition: {
-    servings: number;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-    fiber: number;
-  };
-  tags: string[];
-  likes: number;
-  views: number;
-  uploadedByUserId: string;
-  aiMetadata: {
-    detectedIngredients: string[];
-    detectedTechniques: string[];
-    confidenceScore: number;
-    suggestedHashtags: string[];
-    equipmentNeeded: string[];
-    skillLevel: string;
-    totalTime: number; // in minutes
-    prepTime: number; // in minutes
-    cookTime: number; // in minutes
-    estimatedCost: {
-      min: number; // in cents
-      max: number; // in cents
-      currency: string;
+  servings?: number;
+  analysis?: {
+    aiMetadata?: {
+      skillLevel?: string;
+      totalTime?: number;
+      prepTime?: number;
+      cookTime?: number;
+      detectedTechniques?: string[];
+      suggestedHashtags?: string[];
+      equipmentNeeded?: string[];
+      estimatedCost?: {
+        min: number;
+        max: number;
+        currency: string;
+      };
     };
-    lastProcessed: Timestamp;
+    ingredients?: Array<{
+      name: string;
+      amount: number;
+      unit: string;
+      notes?: string;
+      estimatedPrice?: number;
+    }>;
+    instructions?: Array<{
+      description: string;
+      duration?: number;
+      timestamp?: number;
+      notes?: string;
+    }>;
+    nutrition?: {
+      calories?: number;
+      protein?: number;
+      carbs?: number;
+      fat?: number;
+      fiber?: number;
+      servings?: number;
+    };
   };
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  status: "processing" | "active" | "failed";
+  views?: number;
+  likes?: number;
+  dislikes?: number;
+  status?:
+    | "draft"
+    | "published"
+    | "archived"
+    | "processing"
+    | "ready"
+    | "failed";
   error?: string;
 }
 
@@ -68,14 +89,20 @@ export interface FirestoreCollection {
 }
 
 export interface FirestoreUser {
-  id?: string;
+  id: string;
   email: string;
-  displayName?: string;
+  displayName: string;
   photoURL?: string;
-  bio?: string;
-  favoriteRecipes?: string[];
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+  collections?: string[];
+  savedVideos?: string[];
+  likedVideos?: string[];
+  dislikedVideos?: string[];
+  watchedVideos?: string[];
+  preferences?: {
+    dietaryRestrictions?: string[];
+    cuisinePreferences?: string[];
+    skillLevel?: string;
+  };
 }
 
 // Helper function to convert timestamps
