@@ -114,6 +114,38 @@ export function processVideoMetadata(
     throw new Error("No video data provided");
   }
 
+  // Handle failed or rejected videos
+  if (video.status === "failed") {
+    return {
+      id: video.id,
+      title: "Video Unavailable",
+      description: video.error || "This video is no longer available",
+      thumbnailUrl: "",
+      videoUrl: "",
+      status: "failed",
+      error: video.error || "Video processing failed",
+      difficulty: "Beginner",
+      totalTime: 0,
+      prepTime: 0,
+      cookTime: 0,
+      cuisine: "Unknown",
+      ingredients: [],
+      instructions: [],
+      equipmentNeeded: [],
+      detectedTechniques: [],
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      fiber: 0,
+      servings: 1,
+      likes: 0,
+      views: 0,
+      tags: [],
+      suggestedHashtags: [],
+    };
+  }
+
   // Handle missing video URL more gracefully
   if (!video.videoUrl) {
     console.warn("Video URL is missing in video data:", video.id);

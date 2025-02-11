@@ -7,6 +7,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { Fragment, useState } from "react";
+import { HashTag } from "./HashTag";
 import { VideoPlayer } from "./VideoPlayer";
 
 interface VideoModalProps {
@@ -143,12 +144,7 @@ export function VideoModal({
                         {/* Tags */}
                         <div className="flex flex-wrap gap-1 pb-2">
                           {video.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white"
-                            >
-                              #{tag}
-                            </span>
+                            <HashTag key={tag} tag={tag} />
                           ))}
                         </div>
                       </div>

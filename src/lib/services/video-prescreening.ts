@@ -145,11 +145,12 @@ export class VideoPreScreeningService {
       if (!result.success) {
         console.log("Video was rejected by Cloud Function:", result.reason);
 
-        // Update document status to failed
+        // Update document status to rejected and clear the videoUrl
         const docRef = doc(db as Firestore, "videos", videoId);
         await updateDoc(docRef, {
-          status: "failed",
+          status: "rejected", // Use rejected instead of failed
           error: result.reason,
+          videoUrl: "", // Clear the URL
           updatedAt: serverTimestamp(),
         });
 

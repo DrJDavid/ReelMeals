@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useState } from "react";
 import { RecipeViewer } from "../recipe/RecipeViewer";
+import { HashTag } from "./HashTag";
 import { VideoPlayer } from "./VideoPlayer";
 
 // Helper functions for null checks and defaults
@@ -274,12 +275,7 @@ export function VideoCard({
                     {(aiMetadata.suggestedHashtags || [])
                       .slice(0, 2)
                       .map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 rounded-full bg-white/10 backdrop-blur-sm text-xs"
-                        >
-                          #{tag}
-                        </span>
+                        <HashTag key={tag} tag={tag} />
                       ))}
                   </div>
 

@@ -766,8 +766,12 @@ export const analyzeVideo = onRequest(
           expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
         });
 
+      // Get the existing document data to preserve fields
+      const existingData = (await docRef.get()).data() || {};
+
       // Update the document with the signed URL that will work in the browser
       await docRef.update({
+        ...existingData, // Preserve existing fields like uploadedByUserId
         ...analysis,
         status: "active",
         videoUrl: downloadUrl,

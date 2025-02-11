@@ -27,11 +27,35 @@ import { db } from "./initFirebase";
 export async function getVideos(limitCount = 10) {
   if (!db) throw new Error("Firestore not initialized");
   const videosRef = collection(db, "videos");
-  const q = query(videosRef, orderBy("createdAt", "desc"), limit(limitCount));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(
-    (doc) => ({ id: doc.id, ...doc.data() } as FirestoreVideo)
+
+  // Get only videos that:
+  // 1. Are active (and not failed/rejected)
+  // 2. Have no errors
+  const q = query(
+    videosRef,
+    where("status", "==", "active"),
+    where("error", "==", null),
+    orderBy("createdAt", "desc"),
+    limit(limitCount)
   );
+
+  const snapshot = await getDocs(q);
+  const videos = snapshot.docs
+    .map((doc) => ({ id: doc.id, ...doc.data() } as FirestoreVideo))
+    .filter((video) => {
+      // Additional validation of required fields
+      return (
+        video.status === "active" && // Double check status
+        video.videoUrl && // Ensure video URL exists
+        video.videoUrl.length > 0 &&
+        video.title &&
+        video.title.length > 0 &&
+        video.description &&
+        video.description.length > 0
+      );
+    });
+
+  return videos;
 }
 
 export async function getVideo(videoId: string) {

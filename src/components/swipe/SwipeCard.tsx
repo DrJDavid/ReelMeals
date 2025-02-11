@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { useEffect, useState } from "react";
 import { RecipeViewer } from "../recipe/RecipeViewer";
+import { HashTag } from "../video/HashTag";
 
 interface SwipeCardProps {
   video: FirestoreVideo;
@@ -133,12 +134,7 @@ export default function SwipeCard({ video, onError }: SwipeCardProps) {
               {/* Tags */}
               <div className="flex flex-wrap gap-1 pb-2">
                 {metadata.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs bg-white/20 px-2 py-0.5 rounded-full text-white"
-                  >
-                    #{tag}
-                  </span>
+                  <HashTag key={tag} tag={tag} />
                 ))}
               </div>
             </div>
