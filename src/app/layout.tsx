@@ -8,15 +8,17 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ReelMeals",
-  description: "Discover cooking videos through intuitive swipes",
+  description: "Discover and share cooking videos",
   manifest: "/manifest.json",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+  themeColor: "#111827",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "ReelMeals",
   },
-  formatDetection: {
-    telephone: false,
+  other: {
+    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -47,6 +49,7 @@ export default function RootLayout({
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

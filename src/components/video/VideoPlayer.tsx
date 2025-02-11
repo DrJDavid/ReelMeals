@@ -60,7 +60,6 @@ export function VideoPlayer({
         if (videoUrl.startsWith("gs://")) {
           // Get the full path after gs://bucket-name/
           const fullPath = videoUrl.replace(/^gs:\/\/[^\/]+\//, "");
-          console.log("Extracted storage path:", fullPath);
 
           if (!firebaseStorage) {
             throw new Error("Firebase Storage not initialized");
@@ -69,8 +68,20 @@ export function VideoPlayer({
           const videoRef = ref(firebaseStorage, fullPath);
           const url = await getDownloadURL(videoRef);
           setDownloadUrl(url);
-        } else {
+        } else if (
+          videoUrl.startsWith("http://") ||
+          videoUrl.startsWith("https://")
+        ) {
+          // If it's already a valid HTTP URL, use it directly
           setDownloadUrl(videoUrl);
+        } else {
+          // Assume it's a storage path without the gs:// prefix
+          if (!firebaseStorage) {
+            throw new Error("Firebase Storage not initialized");
+          }
+          const videoRef = ref(firebaseStorage, videoUrl);
+          const url = await getDownloadURL(videoRef);
+          setDownloadUrl(url);
         }
       } catch (error) {
         console.error("Error getting video URL:", error);

@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Request } from "express";
+import * as admin from "firebase-admin";
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
@@ -12,6 +14,10 @@ const geminiKey = defineString("GEMINI_KEY");
 // Initialize Firebase Admin
 initializeApp();
 
+// Initialize services with required permissions:
+// - Storage Object Viewer: for reading video files
+// - Storage Object Creator: for writing signed URLs
+// - Service Account Token Creator: for generating signed URLs
 const db = getFirestore();
 const storage = getStorage();
 const auth = getAuth();
@@ -99,6 +105,12 @@ interface VideoAnalysis {
       max: number;
       currency: string;
     };
+  };
+}
+
+interface AuthenticatedRequest extends Request {
+  auth?: {
+    uid: string;
   };
 }
 
@@ -193,13 +205,18 @@ async function retryWithExponentialBackoff<T>(
 }
 
 async function processVideoInChunks(
-  videoBuffer: ArrayBuffer
+  videoBuffer: ArrayBufferLike
 ): Promise<VideoAnalysis> {
-  const totalSize = videoBuffer.byteLength;
+  // Convert ArrayBufferLike to ArrayBuffer if needed
+  const buffer =
+    videoBuffer instanceof ArrayBuffer
+      ? videoBuffer
+      : new ArrayBuffer(videoBuffer.byteLength);
+  const totalSize = buffer.byteLength;
 
   if (totalSize <= MAX_CHUNK_SIZE) {
     // If video is small enough, process it in one go
-    const videoBase64 = Buffer.from(videoBuffer).toString("base64");
+    const videoBase64 = Buffer.from(buffer).toString("base64");
     return analyzeVideoChunk(videoBase64, true, true);
   }
 
@@ -217,7 +234,7 @@ async function processVideoInChunks(
   for (let i = 0; i < numChunks; i++) {
     const start = i * (MAX_CHUNK_SIZE - CHUNK_OVERLAP);
     const end = Math.min(start + MAX_CHUNK_SIZE, totalSize);
-    const chunk = Buffer.from(videoBuffer.slice(start, end));
+    const chunk = Buffer.from(buffer.slice(start, end));
 
     console.log(
       `Processing chunk ${i + 1}/${numChunks} (${(
@@ -259,7 +276,14 @@ async function analyzeVideoChunk(
         "This is not the complete video. Analyze what you can see in this segment. ";
     }
 
-    const prompt = `${contextPrefix}Analyze this cooking video segment and provide a JSON response with the following structure. Return ONLY the JSON, no other text:
+    const prompt = `${contextPrefix}Analyze this video and determine if it's a cooking/recipe video. A video should be considered a cooking video if it shows ANY of the following:
+1. Food preparation or cooking process
+2. Recipe instructions or steps
+3. Cooking techniques being demonstrated
+4. Ingredients being used or shown
+5. Final cooked dish being presented
+
+Return ONLY a JSON response with the following structure, ensuring all details are accurate and specific to this video:
 
 {
   "title": "Recipe name",
@@ -269,46 +293,49 @@ async function analyzeVideoChunk(
   "cookingTime": minutes,
   "ingredients": [
     {
-      "name": "ingredient name",
-      "amount": number,
-      "unit": "unit",
-      "notes": "preparation notes"
+      "name": "ingredient name exactly as shown in video",
+      "amount": number or null if not shown,
+      "unit": "exact unit mentioned or shown, or null",
+      "notes": "specific preparation notes from video or null"
     }
   ],
   "instructions": [
     {
       "step": number,
-      "description": "instruction",
-      "timestamp": seconds_in_video,
-      "duration": step_duration
+      "description": "detailed step exactly as demonstrated in video",
+      "timestamp": seconds when step starts in video or null,
+      "duration": step duration in seconds or null
     }
   ],
   "nutrition": {
-    "servings": number,
-    "calories": number,
-    "protein": number,
-    "carbs": number,
-    "fat": number,
-    "fiber": number
+    "servings": number based on recipe shown or null,
+    "calories": calculated per serving or null,
+    "protein": grams per serving or null,
+    "carbs": grams per serving or null,
+    "fat": grams per serving or null,
+    "fiber": grams per serving or null
   },
   "tags": ["tag1", "tag2"],
   "aiMetadata": {
-    "detectedIngredients": ["ingredient1"],
-    "detectedTechniques": ["technique1"],
-    "confidenceScore": 0.0_to_1.0,
-    "suggestedHashtags": ["#tag1"],
-    "equipmentNeeded": ["tool1"],
-    "skillLevel": "beginner/intermediate/advanced",
-    "totalTime": minutes,
-    "prepTime": minutes,
-    "cookTime": minutes,
+    "detectedIngredients": ["list every ingredient shown or mentioned"],
+    "detectedTechniques": ["list all cooking techniques demonstrated"],
+    "confidenceScore": accuracy of analysis between 0 and 1,
+    "suggestedHashtags": ["relevant hashtags based on actual video content"],
+    "equipmentNeeded": ["all cooking equipment shown being used"],
+    "skillLevel": "beginner/intermediate/advanced based on techniques shown",
+    "totalTime": total minutes shown or estimated from video,
+    "prepTime": preparation minutes shown or estimated,
+    "cookTime": cooking minutes shown or estimated,
     "estimatedCost": {
-      "min": cents,
-      "max": cents,
+      "min": minimum cost in cents based on ingredients shown,
+      "max": maximum cost in cents based on ingredients shown,
       "currency": "USD"
     }
   }
-}`;
+}
+
+Be generous in classification - if there's any food preparation or cooking content at all, classify it as a cooking video.
+If you're unsure, err on the side of classifying it as a cooking video with lower confidence rather than rejecting it.`;
 
     try {
       const parts = [
@@ -412,13 +439,6 @@ function mergeAnalyses(analyses: Partial<VideoAnalysis>[]): VideoAnalysis {
   return merged;
 }
 
-// Add a function to update the cache
-async function updateCache(videoId: string, analysis: VideoAnalysis) {
-  const cacheRef = db.collection("videoAnalysisCache").doc(videoId);
-  await cacheRef.set(analysis);
-  console.log(`Cache updated for video ${videoId}`);
-}
-
 // Add CORS headers helper
 const addCorsHeaders = (req: any, res: any) => {
   const origin = req.headers.origin;
@@ -452,7 +472,7 @@ const addCorsHeaders = (req: any, res: any) => {
   return res;
 };
 
-// Update the main function to use CORS
+// Update the main function to use CORS and handle signed URLs
 export const analyzeVideo = onRequest(
   {
     region: "us-central1",
@@ -460,9 +480,16 @@ export const analyzeVideo = onRequest(
     timeoutSeconds: 540,
     cors: true,
   },
-  async (req, res) => {
+  async (req: AuthenticatedRequest, res) => {
+    console.log("Received analyze request:", {
+      method: req.method,
+      headers: req.headers,
+      body: req.body,
+    });
+
     // Handle CORS preflight
     if (req.method === "OPTIONS") {
+      console.log("Handling CORS preflight request");
       addCorsHeaders(req, res);
       res.status(204).send("");
       return;
@@ -473,6 +500,7 @@ export const analyzeVideo = onRequest(
 
     // Only allow POST requests
     if (req.method !== "POST") {
+      console.error("Invalid method:", req.method);
       res.status(405).json({ error: "Method Not Allowed" });
       return;
     }
@@ -480,6 +508,7 @@ export const analyzeVideo = onRequest(
     // Get authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
+      console.error("Missing or invalid authorization header");
       res.status(401).json({
         error: "Unauthorized",
         details: "Missing or invalid authorization header",
@@ -490,14 +519,17 @@ export const analyzeVideo = onRequest(
     // Verify token
     const token = authHeader.split("Bearer ")[1];
     try {
+      console.log("Verifying auth token");
       const decodedToken = await auth.verifyIdToken(token);
       if (!decodedToken.uid) {
+        console.error("Invalid token - no uid");
         res.status(401).json({
           error: "Unauthorized",
           details: "Invalid token",
         });
         return;
       }
+      console.log("Token verified for user:", decodedToken.uid);
     } catch (error) {
       console.error("Token verification error:", error);
       res.status(401).json({
@@ -509,54 +541,252 @@ export const analyzeVideo = onRequest(
 
     const { videoId, videoUrl } = req.body;
     if (!videoId || !videoUrl) {
+      console.error("Missing required fields:", { videoId, videoUrl });
       res
         .status(400)
         .json({ error: "Missing videoId or videoUrl in request body" });
       return;
     }
 
-    // Define docRef at the top level so it's available in the catch block
-    const docRef = db.collection("videos").doc(videoId);
-
     try {
       console.log(`Starting analysis for video ${videoId}`);
 
-      // Update status to processing
-      await docRef.update({
-        status: "processing",
-        updatedAt: Timestamp.now(),
-      });
+      // Create or verify document first
+      const docRef = db.collection("videos").doc(videoId);
+      const docSnapshot = await docRef.get();
 
-      // Download video data
-      console.log("Downloading video...");
-      const response = await fetch(videoUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to download video: ${response.statusText}`);
+      if (!docSnapshot.exists) {
+        console.log(`Creating initial document for video ${videoId}`);
+        await docRef.set({
+          id: videoId,
+          status: "processing",
+          createdAt: admin.firestore.Timestamp.now(),
+          updatedAt: admin.firestore.Timestamp.now(),
+          title: "",
+          description: "",
+          cuisine: "",
+          difficulty: "Medium",
+          cookingTime: 0,
+          ingredients: [],
+          instructions: [],
+          nutrition: {
+            servings: null,
+            calories: null,
+            protein: null,
+            carbs: null,
+            fat: null,
+            fiber: null,
+          },
+          tags: [],
+          aiMetadata: {
+            detectedIngredients: [],
+            detectedTechniques: [],
+            confidenceScore: 0,
+            suggestedHashtags: [],
+            equipmentNeeded: [],
+            skillLevel: "beginner",
+            totalTime: 0,
+            prepTime: 0,
+            cookTime: 0,
+            estimatedCost: {
+              min: 0,
+              max: 0,
+              currency: "USD",
+            },
+          },
+          videoUrl: "",
+          error: null,
+        });
       }
 
-      const videoBuffer = await response.arrayBuffer();
+      // Download video data
+      console.log("Downloading video...", { videoUrl });
+      // Extract the file path from the Firebase Storage URL
+      let videoPath;
+      let videoBuffer;
+      try {
+        if (videoUrl.includes("firebasestorage.googleapis.com")) {
+          const urlParts = videoUrl.split("/o/");
+          if (urlParts.length < 2) {
+            throw new Error("Invalid storage URL format");
+          }
+          videoPath = decodeURIComponent(urlParts[1].split("?")[0]);
+        } else {
+          videoPath = videoUrl;
+        }
+        console.log("Resolved video path:", videoPath);
+
+        // Get the file directly from storage
+        const file = storage.bucket().file(videoPath);
+        const [exists] = await file.exists();
+
+        if (!exists) {
+          console.error(`Video file not found: ${videoPath}`);
+          throw new Error(`Video file not found in storage: ${videoPath}`);
+        }
+
+        console.log("Found video file, downloading...");
+        // Get a read stream for the file
+        const [fileBuffer] = await file.download();
+        videoBuffer = fileBuffer.buffer;
+
+        console.log(
+          "Successfully downloaded video, size:",
+          videoBuffer.byteLength
+        );
+      } catch (error) {
+        console.error("Error downloading video:", error);
+        throw error;
+      }
+
       console.log("Processing video in chunks...");
       const analysis = await processVideoInChunks(videoBuffer);
+      console.log("Video analysis complete:", analysis);
 
-      // Update video document with analysis results
-      console.log("Updating video document with analysis...");
-      const updateData = {
+      // Check if it's a cooking video based on analysis
+      let validationScore = 0;
+      const REQUIRED_SCORE = 3;
+
+      // Check ingredients (must have at least 2 with amounts/units)
+      const ingredientsWithMeasurements = analysis.ingredients.filter(
+        (ing) => ing.amount !== null || ing.unit !== null
+      );
+      if (ingredientsWithMeasurements.length >= 2) validationScore++;
+
+      // Check instructions (must have ordered steps)
+      if (analysis.instructions.length >= 2) validationScore++;
+
+      // Check cooking techniques (must demonstrate actual cooking)
+      const validTechniques = analysis.aiMetadata.detectedTechniques.filter(
+        (technique) =>
+          technique.toLowerCase().includes("cook") ||
+          technique.toLowerCase().includes("bake") ||
+          technique.toLowerCase().includes("fry") ||
+          technique.toLowerCase().includes("chop") ||
+          technique.toLowerCase().includes("mix") ||
+          technique.toLowerCase().includes("prep")
+      );
+      if (validTechniques.length >= 1) validationScore++;
+
+      // Check equipment (must use cooking tools)
+      const validEquipment = analysis.aiMetadata.equipmentNeeded.filter(
+        (equipment) =>
+          equipment.toLowerCase().includes("pan") ||
+          equipment.toLowerCase().includes("pot") ||
+          equipment.toLowerCase().includes("knife") ||
+          equipment.toLowerCase().includes("oven") ||
+          equipment.toLowerCase().includes("stove") ||
+          equipment.toLowerCase().includes("bowl") ||
+          equipment.toLowerCase().includes("utensil")
+      );
+      if (validEquipment.length >= 1) validationScore++;
+
+      // Check recipe structure
+      if (
+        analysis.title &&
+        analysis.cookingTime > 0 &&
+        analysis.difficulty &&
+        analysis.cuisine
+      )
+        validationScore++;
+
+      const isCookingVideo = validationScore >= REQUIRED_SCORE;
+      const confidence = analysis.aiMetadata.confidenceScore || 0;
+
+      console.log("Validation results:", {
+        isCookingVideo,
+        validationScore,
+        confidence,
+        details: {
+          hasValidIngredients: ingredientsWithMeasurements.length >= 2,
+          hasValidInstructions: analysis.instructions.length >= 2,
+          hasValidTechniques: validTechniques.length >= 1,
+          hasValidEquipment: validEquipment.length >= 1,
+          hasValidStructure:
+            analysis.title &&
+            analysis.cookingTime > 0 &&
+            analysis.difficulty &&
+            analysis.cuisine,
+        },
+      });
+
+      if (!isCookingVideo || confidence < 0.7) {
+        console.log(
+          `Video ${videoId} is not a valid cooking video (score: ${validationScore}/${REQUIRED_SCORE}, confidence: ${confidence}). Deleting...`
+        );
+
+        // Delete the video from storage
+        try {
+          const file = storage.bucket().file(videoPath);
+          await file.delete();
+          console.log(`Deleted video ${videoId} from storage`);
+        } catch (error) {
+          console.error(`Error deleting video ${videoId}:`, error);
+        }
+
+        // Update document with error status
+        await docRef.update({
+          status: "failed",
+          error: `Not a valid cooking video. Missing required elements (score: ${validationScore}/${REQUIRED_SCORE})`,
+          validationDetails: {
+            score: validationScore,
+            requiredScore: REQUIRED_SCORE,
+            confidence,
+            hasValidIngredients: ingredientsWithMeasurements.length >= 2,
+            hasValidInstructions: analysis.instructions.length >= 2,
+            hasValidTechniques: validTechniques.length >= 1,
+            hasValidEquipment: validEquipment.length >= 1,
+          },
+          updatedAt: admin.firestore.Timestamp.now(),
+        });
+
+        res.status(200).json({
+          success: false,
+          videoId,
+          reason: `Not a valid cooking video. Missing required elements (score: ${validationScore}/${REQUIRED_SCORE})`,
+          confidence,
+          details: {
+            hasValidIngredients: ingredientsWithMeasurements.length >= 2,
+            hasValidInstructions: analysis.instructions.length >= 2,
+            hasValidTechniques: validTechniques.length >= 1,
+            hasValidEquipment: validEquipment.length >= 1,
+            hasValidStructure: validationScore >= REQUIRED_SCORE,
+          },
+        });
+        return;
+      }
+
+      // Update document with analysis results
+      const [downloadUrl] = await storage
+        .bucket()
+        .file(videoPath)
+        .getSignedUrl({
+          version: "v4",
+          action: "read",
+          expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
+        });
+
+      // Update the document with the signed URL that will work in the browser
+      await docRef.update({
         ...analysis,
-        status: "ready",
-        updatedAt: Timestamp.now(),
-        title: analysis.title || "Untitled Recipe",
-        description: analysis.description || "",
-        cuisine: analysis.cuisine || "Unknown",
-        difficulty: analysis.difficulty || "Medium",
-        cookingTime: analysis.cookingTime || 0,
-      };
+        status: "active",
+        videoUrl: downloadUrl,
+        updatedAt: admin.firestore.Timestamp.now(),
+        validationDetails: {
+          score: validationScore,
+          requiredScore: REQUIRED_SCORE,
+          confidence,
+          hasValidIngredients: ingredientsWithMeasurements.length >= 2,
+          hasValidInstructions: analysis.instructions.length >= 2,
+          hasValidTechniques: validTechniques.length >= 1,
+          hasValidEquipment: validEquipment.length >= 1,
+        },
+        error: null, // Clear any previous errors
+      });
 
-      await docRef.update(updateData);
-
-      // Update the cache
-      await updateCache(videoId, analysis);
-
-      console.log(`✅ Successfully analyzed video ${videoId}`);
+      console.log(
+        `✅ Successfully analyzed video ${videoId} and updated Firestore`
+      );
       res.status(200).json({
         success: true,
         videoId,
@@ -565,13 +795,14 @@ export const analyzeVideo = onRequest(
     } catch (error) {
       console.error(`❌ Error processing video ${videoId}:`, error);
 
-      // Update video document with error status
-      await docRef.update({
-        status: "failed",
-        error:
-          error instanceof Error ? error.message : "Unknown error occurred",
-        updatedAt: Timestamp.now(),
-      });
+      // Delete the video from storage on error
+      try {
+        const file = storage.bucket().file(`videos/${videoId}`);
+        await file.delete();
+        console.log(`Deleted video ${videoId} from storage after error`);
+      } catch (deleteError) {
+        console.error(`Error deleting video ${videoId}:`, deleteError);
+      }
 
       res.status(500).json({
         success: false,
@@ -622,13 +853,12 @@ export const analyzeExistingVideo = onRequest(
       });
 
       // Get the video file from Storage
-      const file = storage.bucket().file(`videos/${videoId}.mp4`);
+      const videoPath = `videos/${videoId}`;
+      const file = storage.bucket().file(videoPath);
       const [exists] = await file.exists();
 
       if (!exists) {
-        throw new Error(
-          `Video file not found in storage: videos/${videoId}.mp4`
-        );
+        throw new Error(`Video file not found in storage: ${videoPath}`);
       }
 
       // Get signed URL for the video

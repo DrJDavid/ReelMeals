@@ -1,19 +1,17 @@
 import { db, firebaseStorage } from "@/lib/firebase/initFirebase";
-import { doc, Firestore, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import {
-  deleteObject,
   FirebaseStorage,
   getDownloadURL,
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { withTimestamps } from "../firebase/firestore-schema";
 import { VideoPreScreeningService } from "./video-prescreening";
 
 // Constants for validation
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime", "video/x-msvideo"];
-const MIN_CONFIDENCE_THRESHOLD = 0.85;
+const MIN_CONFIDENCE_THRESHOLD = 0.6;
 const VIDEO_ANALYSIS_ENDPOINT =
   process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_URL + "/analyzeVideo";
 
@@ -95,10 +93,54 @@ export async function uploadVideo(
     );
   }
 
+  // Create a unique ID for the video that will be used throughout the process
+  const videoId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const videoRef = ref(firebaseStorage as FirebaseStorage, `${videoId}.mp4`);
+
   try {
-    // Create a unique ID for the video
-    const videoId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const videoRef = ref(firebaseStorage as FirebaseStorage, `${videoId}.mp4`);
+    // Create initial document with "uploading" status
+    const initialDocRef = doc(db, "videos", videoId);
+    await setDoc(initialDocRef, {
+      id: videoId,
+      status: "uploading",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      uploadedByUserId: userId,
+      title: "",
+      description: "",
+      cuisine: "",
+      difficulty: "Medium",
+      cookingTime: 0,
+      ingredients: [],
+      instructions: [],
+      nutrition: {
+        servings: null,
+        calories: null,
+        protein: null,
+        carbs: null,
+        fat: null,
+        fiber: null,
+      },
+      tags: [],
+      aiMetadata: {
+        detectedIngredients: [],
+        detectedTechniques: [],
+        confidenceScore: 0,
+        suggestedHashtags: [],
+        equipmentNeeded: [],
+        skillLevel: "beginner",
+        totalTime: 0,
+        prepTime: 0,
+        cookTime: 0,
+        estimatedCost: {
+          min: 0,
+          max: 0,
+          currency: "USD",
+        },
+      },
+      videoUrl: "",
+      error: null,
+    });
 
     // Start upload with retry logic
     let retryCount = 0;
@@ -156,16 +198,21 @@ export async function uploadVideo(
     // Get the video URL
     const videoUrl = await getDownloadURL(videoRef);
 
+    // Add a small delay to ensure the file is accessible
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
       // Pre-screen the video
-      const result = await VideoPreScreeningService.preScreenVideo(videoUrl);
+      const result = await VideoPreScreeningService.preScreenVideo(
+        videoUrl,
+        videoId
+      );
 
-      // Validate pre-screening results
-      if (
-        !result.isCookingVideo ||
-        result.confidence < MIN_CONFIDENCE_THRESHOLD
-      ) {
-        await deleteObject(videoRef);
+      // If the video was rejected
+      if (!result.success) {
+        // The Cloud Function will handle deletion
+        onProgress?.(100); // Complete the progress
+
         return {
           videoId: "",
           preScreeningResult: {
@@ -176,57 +223,18 @@ export async function uploadVideo(
         };
       }
 
-      // Initialize video document
-      const videoData = {
-        id: videoId,
-        videoUrl,
-        thumbnailUrl: videoUrl, // TODO: Implement thumbnail generation
-        title: "Processing Recipe...",
-        description: "",
-        cuisine: "Unknown",
-        difficulty: "Medium",
-        cookingTime: 0,
-        ingredients: [],
-        instructions: [],
-        likes: 0,
-        views: 0,
-        status: "processing" as const,
-        uploadedByUserId: userId,
-        userId: userId,
-        tags: [],
-        techniques: [],
-      };
-
-      // Create the video document with timestamps
-      const videoWithTimestamps = withTimestamps(videoData);
-      await setDoc(
-        doc(db as Firestore, "videos", videoId),
-        videoWithTimestamps
-      ).catch((error) => {
-        throw new VideoUploadError(
-          "Failed to create video document",
-          "DOCUMENT_CREATION_FAILED"
-        );
-      });
-
-      // Trigger video analysis
-      await triggerVideoAnalysis(videoId, videoUrl);
-
       onProgress?.(100); // Upload and processing complete
 
       return {
         videoId,
         preScreeningResult: {
           isValid: true,
-          reason: result.reason,
+          reason: "Video accepted and being processed",
           confidence: result.confidence,
         },
       };
     } catch (error) {
-      // Clean up video if analysis fails
-      await deleteObject(videoRef).catch((deleteError) => {
-        console.error("Failed to delete invalid video:", deleteError);
-      });
+      // The Cloud Function will handle cleanup if there's an error
       throw error;
     }
   } catch (error) {

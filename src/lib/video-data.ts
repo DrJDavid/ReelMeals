@@ -110,16 +110,64 @@ interface VideoAnalysis {
 export function processVideoMetadata(
   video: FirestoreVideo
 ): ProcessedVideoMetadata {
+  if (!video) {
+    throw new Error("No video data provided");
+  }
+
+  // Handle missing video URL more gracefully
+  if (!video.videoUrl) {
+    console.warn("Video URL is missing in video data:", video.id);
+    return {
+      id: video.id,
+      title: "Video Unavailable",
+      description: "This video is currently unavailable",
+      thumbnailUrl: "",
+      videoUrl: "",
+      status: "failed",
+      error: "Video URL is missing",
+      difficulty: "Beginner",
+      totalTime: 0,
+      prepTime: 0,
+      cookTime: 0,
+      cuisine: "Unknown",
+      ingredients: [],
+      instructions: [],
+      equipmentNeeded: [],
+      detectedTechniques: [],
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      fiber: 0,
+      servings: 1,
+      likes: 0,
+      views: 0,
+      tags: [],
+      suggestedHashtags: [],
+    };
+  }
+
   const analysis = (video.analysis || {}) as VideoAnalysis;
   const aiMetadata = analysis.aiMetadata || {};
   const nutrition = analysis.nutrition || {};
+
+  // Ensure the video URL is valid
+  let processedVideoUrl = video.videoUrl;
+  if (
+    !processedVideoUrl.startsWith("http://") &&
+    !processedVideoUrl.startsWith("https://") &&
+    !processedVideoUrl.startsWith("gs://")
+  ) {
+    // If it's a storage path without protocol, assume it's a Firebase Storage path
+    processedVideoUrl = `gs://${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/${processedVideoUrl}`;
+  }
 
   return {
     id: video.id,
     title: video.title || "Untitled Recipe",
     description: video.description || "No description available",
     thumbnailUrl: video.thumbnailUrl || "",
-    videoUrl: video.videoUrl || "",
+    videoUrl: processedVideoUrl,
     status: video.status || "processing",
     error: video.error,
 

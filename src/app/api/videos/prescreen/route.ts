@@ -38,22 +38,22 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    // Add CORS headers to all responses
-    const response = (data: any, status = 200) => {
-      return NextResponse.json(data, {
-        status,
-        headers: {
-          ...corsHeaders,
-          "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
-        },
-      });
-    };
+  // Add CORS headers to all responses
+  const createResponse = (data: any, status = 200) => {
+    return NextResponse.json(data, {
+      status,
+      headers: {
+        ...corsHeaders,
+        "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+      },
+    });
+  };
 
+  try {
     // Verify authentication
     const authHeader = request.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return response(
+      return createResponse(
         {
           error: "Unauthorized",
           details: "Missing or invalid authorization header",
@@ -62,38 +62,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verify token
     const token = authHeader.split("Bearer ")[1];
     try {
       const decodedToken = await auth.verifyIdToken(token);
       if (!decodedToken.uid) {
-        return response(
+        return createResponse(
           { error: "Unauthorized", details: "Invalid token" },
           401
         );
       }
     } catch (error) {
       console.error("Token verification error:", error);
-      return response(
+      return createResponse(
         { error: "Unauthorized", details: "Token verification failed" },
         401
       );
     }
 
-    // Get video URL from request
+    // Get video URL and ID from request
     const body = await request.json().catch(() => ({}));
-    const { videoUrl } = body;
+    const { videoUrl, videoId } = body;
 
-    if (!videoUrl) {
-      return response(
-        { error: "Bad Request", details: "No video URL provided" },
+    if (!videoUrl || !videoId) {
+      return createResponse(
+        { error: "Bad Request", details: "Missing videoUrl or videoId" },
         400
       );
     }
 
+    console.log("Processing video:", { videoUrl, videoId });
+
+    // Get the full storage URL
+    const storageUrl = `https://storage.googleapis.com/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/${videoUrl}`;
+    console.log("Using storage URL:", storageUrl);
+
     // Download video content
-    const fetchResponse = await fetch(videoUrl);
+    const fetchResponse = await fetch(storageUrl);
     if (!fetchResponse.ok) {
-      return response(
+      console.error("Failed to fetch video:", {
+        status: fetchResponse.status,
+        statusText: fetchResponse.statusText,
+        url: storageUrl,
+      });
+      return createResponse(
         {
           error: "Bad Request",
           details: `Failed to fetch video: ${fetchResponse.statusText}`,
@@ -145,12 +157,14 @@ Requirements for a valid cooking video (confidence should be at least 0.85):
 
       // Parse the pre-screening response
       const preScreenData = JSON.parse(preScreenText);
+      console.log("Pre-screening results:", preScreenData);
 
       // If video is not valid or confidence is too low, reject it
       if (!preScreenData.isCookingVideo || preScreenData.confidence < 0.85) {
-        return response({
-          ...preScreenData,
-          analysis: null,
+        return createResponse({
+          success: false,
+          reason: preScreenData.reason,
+          confidence: preScreenData.confidence,
         });
       }
 
@@ -158,6 +172,9 @@ Requirements for a valid cooking video (confidence should be at least 0.85):
       const analysisPrompt = `Watch this cooking video carefully and provide a detailed, unique analysis specific to this exact video. Return ONLY a JSON response with the following structure, ensuring all details are accurate and specific to this video:
 
 {
+  "title": "Recipe name",
+  "description": "Detailed description",
+  "cuisine": "Specific cuisine type",
   "ingredients": [
     {
       "name": "ingredient name exactly as shown in video",
@@ -225,15 +242,17 @@ Important:
 
       // Parse the analysis response
       const analysisData = JSON.parse(analysisText);
+      console.log("Analysis complete:", analysisData);
 
       // Return both pre-screening and analysis results
-      return response({
-        ...preScreenData,
+      return createResponse({
+        success: true,
+        confidence: preScreenData.confidence,
         analysis: analysisData,
       });
     } catch (error) {
       console.error("Error in AI processing:", error);
-      return response(
+      return createResponse(
         {
           error: "AI Processing Error",
           details: error instanceof Error ? error.message : "Unknown error",
@@ -243,7 +262,7 @@ Important:
     }
   } catch (error) {
     console.error("Error processing video:", error);
-    return response(
+    return createResponse(
       {
         error: "Internal Server Error",
         details: error instanceof Error ? error.message : "Unknown error",
